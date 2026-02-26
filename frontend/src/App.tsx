@@ -5,6 +5,7 @@ import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import PublicRoutes from "./wrappers/PublicRoutes";
 import PrivateRoutes from "./wrappers/PrivateRoutes";
+import Products from "./pages/products";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
       </Route>
       <Route element={<PrivateRoutes />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/products/*" element={<Products />} />
       </Route>
     </Routes>
   );

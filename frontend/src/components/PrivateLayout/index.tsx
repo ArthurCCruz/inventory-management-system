@@ -1,6 +1,7 @@
-import { AppShell, Group, Menu, UnstyledButton, Text } from "@mantine/core";
+import { AppShell, Group, Menu, UnstyledButton, Text, Anchor } from "@mantine/core";
 import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, logout } = useAuth();
@@ -9,7 +10,17 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
     <AppShell header={{ height: 60 }}>
       <AppShell.Header>
         <Group justify="space-between" h="100%" px="md">
-          <Text size="lg" fw={700}>Inventory Management</Text>
+          <Group>
+            <Anchor
+              component={Link}
+              to="/products"
+              size="lg"
+              fw={700}
+              underline="never"
+            >
+              Products
+            </Anchor>
+          </Group>
           
           {user && (
             <Menu shadow="md" width={200}>

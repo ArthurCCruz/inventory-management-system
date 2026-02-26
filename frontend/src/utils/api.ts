@@ -57,5 +57,9 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
     throw new Error(await res.json());
   }
 
-  return res.json();
+  try {
+    return await res.json();
+  } catch (error) {
+    return null as unknown as T;
+  }
 };
