@@ -13,6 +13,12 @@ Each application has its own Dockerfile and docker-compose.yml for independent d
 
 ## 📦 Tech Stack
 
+### Backend
+- Python 3.11
+- Django 4.2 LTS
+- Django REST Framework
+- PostgreSQL 15
+
 ### Frontend
 - Node.js 20
 - React 18
@@ -28,6 +34,31 @@ Each application has its own Dockerfile and docker-compose.yml for independent d
 - Git (optional, for cloning)
 
 ### Development Setup
+
+#### Backend Development
+
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Copy the environment file and configure if needed:
+```bash
+cp .env.example .env
+```
+
+3. Start the backend services (Django + PostgreSQL):
+```bash
+docker compose up --build
+```
+
+The backend API will be available at:
+- API: http://localhost:8000/api/
+- Admin: http://localhost:8000/admin/
+- Health check: http://localhost:8000/api/health/
+
+**Hot Reload**: The Django development server will automatically reload when you edit Python files in the `backend/` directory.
+
 
 #### Frontend Development
 
@@ -52,6 +83,23 @@ The frontend will be available at:
 **Hot Module Replacement (HMR)**: Vite will automatically reload when you edit files in the `frontend/src/` directory.
 
 ## 🔧 Configuration
+
+### Backend Environment Variables
+
+Edit `backend/.env`:
+
+```bash
+# Django settings
+SECRET_KEY=your-secret-key-here-change-in-production
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database settings
+DB_NAME=inventory_db
+DB_USER=inventory_user
+DB_PASSWORD=inventory_password
+DB_HOST=db
+DB_PORT=5432
 
 ### Frontend Environment Variables
 
