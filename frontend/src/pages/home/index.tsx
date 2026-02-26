@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { Container, Title, Card, Text, Group, Stack, Badge } from '@mantine/core'
 
-const App = () => {
-  const { data: apiStatus, isLoading } = useQuery({
+interface ApiHealthResponse {
+  status: string
+  message: string
+}
+
+const Home = () => {
+  const { data: apiStatus, isLoading } = useQuery<ApiHealthResponse>({
     queryKey: ['api-health'],
     queryFn: async () => {
       const response = await fetch('/api/health/')
@@ -50,6 +55,6 @@ const App = () => {
       </Stack>
     </Container>
   )
-};
+}
 
-export default App
+export default Home
