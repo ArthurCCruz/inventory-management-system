@@ -50,3 +50,49 @@ Content-Type: {{contentType}}
 GET {{baseUrl}}/{{apiVersion}}/auth/me/
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name CreateProduct
+POST {{baseUrl}}/{{apiVersion}}/products/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "name": "Product 1",
+    "sku": "1234567890",
+    "description": "Product 1 description",
+    "unit": "kg"
+}
+
+###
+
+# @name ListProducts
+GET {{baseUrl}}/{{apiVersion}}/products/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name GetProduct
+GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name UpdateProduct
+PATCH {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "name": "Product 1 Updated"
+}
+
+###
+
+# @name DeleteProduct
+DELETE {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}

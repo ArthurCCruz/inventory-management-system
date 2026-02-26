@@ -17,3 +17,9 @@ class SignupSerializer(serializers.ModelSerializer):
             password=validated_data["password"],
         )
         return user
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "name"]
+        read_only_fields = ["id", "name"]
