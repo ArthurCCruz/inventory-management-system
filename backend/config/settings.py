@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'apps.api',
+    'apps.users',
 ]
 
 MIDDLEWARE = [
@@ -94,6 +95,8 @@ DATABASES = {
         'PORT': env('DB_PORT', default='5432'),
     }
 }
+
+AUTH_USER_MODEL = "users.User"
 
 
 # Password validation
