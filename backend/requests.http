@@ -1,10 +1,18 @@
+@baseUrl = http://localhost:8000
+@apiVersion = v1
+@contentType = application/json
+
+###
+
 # @name HealthCheck
-GET http://localhost:8000/v1/health/
-Content-Type: application/json
+GET {{baseUrl}}/{{apiVersion}}/health/
+Content-Type: {{contentType}}
+
+###
 
 # @name Signup
-POST http://localhost:8000/v1/users/
-Content-Type: application/json
+POST {{baseUrl}}/{{apiVersion}}/users/
+Content-Type: {{contentType}}
 
 {
     "first_name": "Test",
@@ -12,3 +20,33 @@ Content-Type: application/json
     "username": "testuser",
     "password": "testpassword"
 }
+
+###
+
+# @name Login
+POST {{baseUrl}}/{{apiVersion}}/auth/login/
+Content-Type: {{contentType}}
+
+{
+    "username": "testuser",
+    "password": "testpassword"
+}
+
+###
+
+# @name Refresh
+POST {{baseUrl}}/{{apiVersion}}/auth/refresh/
+Content-Type: {{contentType}}
+
+###
+
+# @name Logout
+POST {{baseUrl}}/{{apiVersion}}/auth/logout/
+Content-Type: {{contentType}}
+
+###
+
+# @name Me
+GET {{baseUrl}}/{{apiVersion}}/auth/me/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
