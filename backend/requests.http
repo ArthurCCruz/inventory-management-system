@@ -1,3 +1,14 @@
 # @name HealthCheck
 GET http://localhost:8000/v1/health/
 Content-Type: application/json
+
+# @name Signup
+POST http://localhost:8000/v1/users/
+Content-Type: application/json
+
+{
+    "first_name": "Test",
+    "last_name": "User",
+    "username": "testuser",
+    "password": "testpassword"
+}
