@@ -2,18 +2,56 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const BASE_URL = `${API_URL}/v1`;
 
-const post = async (endpoint: string, data: any) => {
-  const response = await fetch(`${BASE_URL}/${endpoint}`, {
+let accessToken: string | null = null;
+
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
+}
+
+const refreshAccessToken = async (): Promise<string | null> => {
+  const res = await fetch(`${BASE_URL}/auth/refresh/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    credentials: "include", // sends refresh cookie
   });
-  if (!response.ok) {
-    throw new Error(await response.json());
-  }
-  return response.json();
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.access ?? null;
+}
+
+const shouldRefreshToken = (response: { messages?: { message: string }[] }) => {
+  return response.messages && response.messages.find(({message}: {message: string}) => message.includes("Token is expired"));
 };
 
-export { post };
+export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Promise<T> => {
+  const url = `${BASE_URL}/${endpoint}`;
+
+  const headers = new Headers(init.headers);
+  if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
+  headers.set("Content-Type", "application/json");
+
+  const doRequest = () =>
+    fetch(url, {
+      ...init,
+      headers,
+      credentials: "include",
+    });
+
+  let res = await doRequest();
+
+  // If access token expired, try refresh once and retry
+  if (res.status === 401 && shouldRefreshToken(await res.json())) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      setAccessToken(newToken);
+      headers.set("Authorization", `Bearer ${newToken}`);
+      res = await doRequest();
+    }
+  }
+
+  if (!res.ok) {
+    throw new Error(await res.json());
+  }
+
+  return res.json();
+};
