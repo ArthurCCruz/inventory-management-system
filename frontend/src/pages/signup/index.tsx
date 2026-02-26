@@ -1,22 +1,24 @@
 import { Container, Title, Stack, Card, TextInput, Button } from "@mantine/core"
 import { useForm } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
-import { post } from "../../utils/api";
+import { apiFetch } from "../../utils/api";
 import PublicLayout from "../../components/PublicLayout";
 
-async function signupUser(data: {
+const signupUser = async (data: {
   firstName: string;
   lastName: string;
   username: string;
   password: string;
-}) {
-  const response = await post("users/", {
-    first_name: data.firstName,
-    last_name: data.lastName,
-    username: data.username,
-    password: data.password,
+}) => {
+  const response = await apiFetch("users/", {
+    method: "POST",
+    body: JSON.stringify({
+      first_name: data.firstName,
+      last_name: data.lastName,
+      username: data.username,
+      password: data.password,
+    }),
   });
-
   return response;
 }
 
