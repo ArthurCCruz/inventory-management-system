@@ -1,22 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
 import { Container, Title, Card, Text, Group, Stack, Badge } from '@mantine/core'
 import PublicLayout from '../../components/PublicLayout'
+import { apiFetch } from '@/utils/api'
 
 interface ApiHealthResponse {
   status: string
   message: string
 }
 
+const getApiHealth = async (): Promise<ApiHealthResponse> => {
+  const response = await apiFetch<ApiHealthResponse>("health/", { method: "GET" });
+  return response;
+}
+
 const Home = () => {
-  const { data: apiStatus, isLoading } = useQuery<ApiHealthResponse>({
+  const { data: apiStatus, isLoading } = useQuery({
     queryKey: ['api-health'],
-    queryFn: async () => {
-      const response = await fetch('/api/health/')
-      if (!response.ok) {
-        throw new Error('API health check failed')
-      }
-      return response.json()
-    },
+    queryFn: getApiHealth,
   })
 
   return (
@@ -44,14 +44,6 @@ const Home = () => {
                   <Badge color="red">Disconnected</Badge>
                 )}
               </Group>
-
-              {apiStatus && (
-                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
-                  <Text size="sm" className="font-mono">
-                    {JSON.stringify(apiStatus, null, 2)}
-                  </Text>
-                </div>
-              )}
             </Stack>
           </Card>
         </Stack>
