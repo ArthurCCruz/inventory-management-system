@@ -2,7 +2,6 @@ import { Container, Title, Stack, Card, TextInput, Button } from "@mantine/core"
 import { useForm } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
 import { apiFetch } from "../../utils/api";
-import PublicLayout from "../../components/PublicLayout";
 
 const signupUser = async (data: {
   firstName: string;
@@ -69,49 +68,47 @@ const Signup = () => {
   };
 
   return (
-    <PublicLayout>
-      <Container size="md" className="py-8">
-        <Stack gap="lg">
-          <div className="text-center">
-            <Title order={1} className="mb-4">
-              Signup
-            </Title>
-          </div>
+    <Container size="md" className="py-8">
+      <Stack gap="lg">
+        <div className="text-center">
+          <Title order={1} className="mb-4">
+            Signup
+          </Title>
+        </div>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <form onSubmit={form.onSubmit(handleSubmit)}>
-              <Stack gap="md">
-                <TextInput
-                  label="First Name"
-                  placeholder="First Name"
-                  required
-                  {...form.getInputProps("firstName")}
-                />
-                <TextInput
-                  label="Last Name"
-                  placeholder="Last Name"
-                  required
-                  {...form.getInputProps("lastName")}
-                />
-                <TextInput
-                  label="Username"
-                  placeholder="Username"
-                  required
-                  {...form.getInputProps("username")}
-                />
-                <TextInput
-                  label="Password"
-                  placeholder="Password"
-                  required
-                  {...form.getInputProps("password")}
-                />
-                <Button type="submit">Send</Button>
-              </Stack>
-            </form>
-          </Card>
-        </Stack>
-      </Container>
-    </PublicLayout>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stack gap="md">
+              <TextInput
+                label="First Name"
+                placeholder="First Name"
+                required
+                {...form.getInputProps("firstName")}
+              />
+              <TextInput
+                label="Last Name"
+                placeholder="Last Name"
+                required
+                {...form.getInputProps("lastName")}
+              />
+              <TextInput
+                label="Username"
+                placeholder="Username"
+                required
+                {...form.getInputProps("username")}
+              />
+              <TextInput
+                label="Password"
+                placeholder="Password"
+                required
+                {...form.getInputProps("password")}
+              />
+              <Button type="submit">Send</Button>
+            </Stack>
+          </form>
+        </Card>
+      </Stack>
+    </Container>
   );
 };
 

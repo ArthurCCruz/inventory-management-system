@@ -6,6 +6,7 @@ import App from './App'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import '@mantine/core/styles.css'
+import { AuthProvider } from './contexts/AuthContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
         <BrowserRouter>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </BrowserRouter>
       </MantineProvider>
     </QueryClientProvider>

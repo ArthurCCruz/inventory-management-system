@@ -4,11 +4,15 @@ const BASE_URL = `${API_URL}/v1`;
 
 let accessToken: string | null = null;
 
+export const getAccessToken = () => {
+  return accessToken;
+}
+
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
 }
 
-const refreshAccessToken = async (): Promise<string | null> => {
+export const refreshAccessToken = async (): Promise<string | null> => {
   const res = await fetch(`${BASE_URL}/auth/refresh/`, {
     method: "POST",
     credentials: "include", // sends refresh cookie
@@ -16,6 +20,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
   if (!res.ok) return null;
   const data = await res.json();
+  setAccessToken(data.access ?? null);
   return data.access ?? null;
 }
 
@@ -43,7 +48,6 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
   if (res.status === 401 && shouldRefreshToken(await res.json())) {
     const newToken = await refreshAccessToken();
     if (newToken) {
-      setAccessToken(newToken);
       headers.set("Authorization", `Bearer ${newToken}`);
       res = await doRequest();
     }
