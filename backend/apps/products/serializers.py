@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import Product
-from apps.users.serializers import PublicUserSerializer
-
+from apps.common.serializers import RelatedRecordSerializer
+from apps.users.models import User
 class ProductSerializer(serializers.ModelSerializer):
-    created_by = PublicUserSerializer(read_only=True)
+    created_by = RelatedRecordSerializer(model=User, read_only=True)
     class Meta:
         model = Product
         fields = ["id", "name", "sku", "description", "unit", "created_at", "updated_at", "created_by"]

@@ -96,3 +96,59 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 DELETE {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name CreatePurchaseOrder
+POST {{baseUrl}}/{{apiVersion}}/purchase-orders/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "supplier_name": "Supplier 1",
+    "lines": [
+        {
+            "product": "{{CreateProduct.response.body.$.id}}",
+            "quantity": 10,
+            "unit_price": 100
+        }
+    ]
+}
+
+###
+
+# @name ListPurchaseOrders
+GET {{baseUrl}}/{{apiVersion}}/purchase-orders/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name GetPurchaseOrder
+GET {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name UpdatePurchaseOrder
+PATCH {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "lines": [
+        {
+            "product": "{{CreateProduct.response.body.$.id}}",
+            "quantity": 20,
+            "unit_price": 100
+        }
+    ]
+}
+
+###
+
+# @name DeletePurchaseOrder
+DELETE {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
