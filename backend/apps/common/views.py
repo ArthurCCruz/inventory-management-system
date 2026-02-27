@@ -1,14 +1,7 @@
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import mixins, viewsets
+from rest_framework import viewsets
 
-class OwnedModelViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class OwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
