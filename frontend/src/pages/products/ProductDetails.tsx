@@ -1,5 +1,5 @@
 import { apiFetch } from "@/utils/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "@/utils/date";
 import DetailsView from "@/components/DetailsView";
@@ -8,9 +8,17 @@ import { Divider, SimpleGrid, Stack, Title } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useGetProduct } from "../../utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
+import DataTable, { DataColumn } from "@/components/DataTable";
+import { StockMove } from "@/types/models/stock";
+import { ProductStockMoves } from "@/types/models/product";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
+  return response;
+}
+
+const getProductStockMovesRequest = async (id: string) => {
+  const response = await apiFetch<ProductStockMoves>(`products/${id}/moves/`, { method: "GET" });
   return response;
 }
 
@@ -23,6 +31,13 @@ const ProductDetails = () => {
   const deleteProductMutation = useMutation({
     mutationFn: deleteProductRequest,
   });
+
+  const { data: stockMoves } = useQuery({
+    queryKey: ["product-stock-moves", id],
+    queryFn: () => getProductStockMovesRequest(id!),
+  });
+
+  console.log(stockMoves);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -49,6 +64,16 @@ const ProductDetails = () => {
     },
   ]
 
+  const stockMoveColumns: DataColumn<StockMove>[] = [
+    { label: "Name", render: ({ name }) => name },
+    { label: "Origin", render: ({ origin }) => origin },
+    { label: "From", render: ({ from_location }) => from_location },
+    { label: "To", render: ({ to_location }) => to_location },
+    { label: "Quantity", render: ({ quantity }) => quantity },
+    { label: "Unit", render: () => data.unit },
+    { label: "Status", render: ({ status }) => status },
+  ];
+
   return (
     <DetailsView actions={actions}>
       <SimpleGrid cols={2} spacing="lg">
@@ -69,6 +94,9 @@ const ProductDetails = () => {
       <SimpleGrid cols={2} spacing="lg">
         <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
       </SimpleGrid>
+      <Divider my="lg" />
+      <Title order={3}>Stock Moves</Title>
+      <DataTable data={stockMoves?.stock_moves || []} columns={stockMoveColumns} emptyText="No stock moves found." />
     </DetailsView>
   );
 };
