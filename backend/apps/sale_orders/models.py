@@ -94,6 +94,18 @@ class SaleOrder(OwnedModel):
         self.save(update_fields=["status"])
         return self
 
+    def deliver(self):
+        if self.status != self.Status.RESERVED:
+            raise ValidationError("Only reserved sale orders can be delivered.")
+        
+        for line in self.lines.all():
+            for move in line.stock_move.all():
+                move.set_done()
+        
+        self.status = self.Status.DELIVERED
+        self.save(update_fields=["status"])
+        return self
+
 class SaleOrderLine(models.Model):
     order = models.ForeignKey(SaleOrder, related_name="lines", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)

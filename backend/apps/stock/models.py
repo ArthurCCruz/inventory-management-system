@@ -32,9 +32,6 @@ class StockQuantity(OwnedModel):
         self.quantity += quantity.quantize(Decimal("0.01"))
         if self.quantity < 0:
             raise ValidationError("Stock quantity cannot be negative.")
-        if self.quantity == 0:
-            self.delete()
-            return None
         self.save(update_fields=["quantity"])
         return self
 
@@ -79,6 +76,8 @@ class StockMove(OwnedModel):
           raise ValidationError("Stock needs to be reserved first.")
         quantity_to_move = self.quantity if self.to_location == self.Location.STOCK else -self.quantity
         self.product.stock_quantity.first().update_quantity(quantity_to_move)
+        if self.to_location == self.Location.CUSTOMER:
+            self.product.stock_quantity.first().update_reserved_quantity(-self.quantity)
         self.status = self.Status.DONE
         self.save(update_fields=["status"])
         return self

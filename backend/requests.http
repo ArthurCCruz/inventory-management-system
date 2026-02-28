@@ -245,3 +245,10 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
+
+# @name DeliverSaleOrder
+PATCH {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/deliver/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###

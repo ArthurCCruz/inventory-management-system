@@ -52,3 +52,11 @@ class SaleOrderViewSet(OwnedModelViewSet):
         order.reserve()
         serializer = UpsertSaleOrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["patch"])
+    @transaction.atomic
+    def deliver(self, request, pk=None):
+        order = self.get_object()
+        order.deliver()
+        serializer = UpsertSaleOrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
