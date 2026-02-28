@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Sequence, TypedDict
 from django.db import models
+from django.core.exceptions import ValidationError
 from apps.common.models import OwnedModel
 from apps.products.models import Product
 from decimal import Decimal
+from apps.stock.models import StockMove
 
 if TYPE_CHECKING:
     from django.db.models import Manager
@@ -57,6 +59,27 @@ class SaleOrder(OwnedModel):
         SaleOrderLine.objects.bulk_create(new_lines)
         self.total_price = total_price.quantize(Decimal("0.01"))
         self.save(update_fields=["total_price", "updated_at"])
+        return self
+
+    def confirm(self):
+        if self.status != self.Status.DRAFT:
+            raise ValidationError("Only draft sale orders can be confirmed.")
+        
+        stock_moves = map(lambda line: StockMove(
+            product=line.product,
+            quantity=line.quantity,
+            from_location=StockMove.Location.STOCK,
+            to_location=StockMove.Location.CUSTOMER,
+            sale_order_line=line,
+            origin=self.name,
+            created_by=self.created_by,
+        ), self.lines.all())
+        
+        StockMove.objects.bulk_create(stock_moves)
+        
+        self.status = self.Status.CONFIRMED
+        self.save(update_fields=["status"])
+        
         return self
 
 class SaleOrderLine(models.Model):

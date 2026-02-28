@@ -229,3 +229,12 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 DELETE {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name ConfirmSaleOrder
+PATCH {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/confirm/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###

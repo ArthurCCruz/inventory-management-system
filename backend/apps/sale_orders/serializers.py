@@ -48,8 +48,8 @@ class UpsertSaleOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SaleOrder
-        fields = ["id", "name", "customer_name", "lines"]
-        read_only_fields = ["id", "name"]
+        fields = ["id", "name", "customer_name", "lines", "status"]
+        read_only_fields = ["id", "name", "status"]
 
     def validate(self, attrs: dict) -> dict:
         lines = attrs.get("lines", [])
