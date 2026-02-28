@@ -37,8 +37,6 @@ const ProductDetails = () => {
     queryFn: () => getProductStockMovesRequest(id!),
   });
 
-  console.log(stockMoves);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -92,7 +90,11 @@ const ProductDetails = () => {
       <Divider my="lg" />
       <Title order={3}>Stock</Title>
       <SimpleGrid cols={2} spacing="lg">
-        <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
+        <Stack gap="lg">
+          <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
+          <DetailsField label="Reserved Quantity" value={formatNumber(data.stock_quantity.reserved_quantity)} />
+          <DetailsField label="Available Quantity" value={formatNumber(data.stock_quantity.available_quantity)} />
+        </Stack>
       </SimpleGrid>
       <Divider my="lg" />
       <Title order={3}>Stock Moves</Title>

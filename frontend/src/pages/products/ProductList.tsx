@@ -19,6 +19,8 @@ const ProductList = () => {
     { label: "Name", render: ({ name }) => name },
     { label: "SKU", render: ({ sku }) => sku },
     { label: "Stock Quantity", render: ({ stock_quantity }) => formatNumber(stock_quantity.quantity) },
+    { label: "Reserved Quantity", render: ({ stock_quantity }) => formatNumber(stock_quantity.reserved_quantity) },
+    { label: "Available Quantity", render: ({ stock_quantity }) => formatNumber(stock_quantity.available_quantity) },
     { label: "Unit", render: ({ unit }) => unit },
     { label: "Created At", render: ({ created_at }) => formatDate(created_at) },
     { label: "Updated At", render: ({ updated_at }) => formatDate(updated_at) },
