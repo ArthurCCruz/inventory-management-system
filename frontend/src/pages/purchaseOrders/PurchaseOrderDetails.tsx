@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
 import DetailsView from "@/components/DetailsView";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiFetch } from "@/utils/api";
 import { SimpleGrid, Stack } from "@mantine/core";
@@ -16,14 +16,42 @@ const deletePurchaseOrderRequest = async (id: string) => {
   return response;
 }
 
+const confirmPurchaseOrderRequest = async (id: string) => {
+  const response = await apiFetch(`purchase-orders/${id}/confirm/`, { method: "PATCH" });
+  return response;
+}
+
+const receivePurchaseOrderRequest = async (id: string) => {
+  const response = await apiFetch(`purchase-orders/${id}/receive/`, { method: "PATCH" });
+  return response;
+}
+
 const PurchaseOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading } = useGetPurchaseOrder(id!);
+  const { data, isLoading, refetch } = useGetPurchaseOrder(id!);
 
   const deletePurchaseOrderMutation = useMutation({
     mutationFn: deletePurchaseOrderRequest,
   });
+
+  const confirmPurchaseOrderMutation = useMutation({
+    mutationFn: confirmPurchaseOrderRequest,
+  });
+
+  const receivePurchaseOrderMutation = useMutation({
+    mutationFn: receivePurchaseOrderRequest,
+  });
+
+  const confirmPurchaseOrder = async () => {
+    await confirmPurchaseOrderMutation.mutateAsync(id!);
+    refetch();
+  }
+
+  const receivePurchaseOrder = async () => {
+    await receivePurchaseOrderMutation.mutateAsync(id!);
+    refetch();
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -34,21 +62,41 @@ const PurchaseOrderDetails = () => {
   }
 
   const actions = [
-    {
-      label: "Edit",
-      onClick: () => navigate(`/purchase-orders/${id}/edit`),
-      icon: <IconPencil size={16} />,
-    },
-    {
-      label: "Delete",
-      onClick: async () => {
-        await deletePurchaseOrderMutation.mutateAsync(id!);
-        navigate("/purchase-orders");
-      },
-      icon: <IconTrash size={16} />,
-      color: "red",
-    },
   ];
+
+  if (data.status === "draft") {
+    actions.push(
+      {
+        label: "Edit",
+        onClick: () => navigate(`/purchase-orders/${id}/edit`),
+        icon: <IconPencil size={16} />,
+      },
+      {
+        label: "Confirm",
+        onClick: confirmPurchaseOrder,
+        icon: <IconCheck size={16} />,
+      },
+      {
+        label: "Delete",
+        onClick: async () => {
+          await deletePurchaseOrderMutation.mutateAsync(id!);
+          navigate("/purchase-orders");
+        },
+        icon: <IconTrash size={16} />,
+        color: "red",
+      },
+    )
+  }
+
+  if (data.status === "confirmed") {
+    actions.push(
+      {
+        label: "Receive",
+        onClick: receivePurchaseOrder,
+        icon: <IconCheck size={16} />,
+      },
+    )
+  }
 
   const lineColumns: DataColumn<PurchaseOrderLine>[] = [
     { label: "Product", render: ({ product }) => product.name },
