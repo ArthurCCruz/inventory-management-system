@@ -5,12 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import ProductForm, { ProductFormValues } from "./components/ProductForm";
 
-const createProductRequest = async (data: {
-  name: string;
-  sku: string;
-  description: string;
-  unit: string;
-}) => {
+const createProductRequest = async (data: ProductFormValues) => {
   const response = await apiFetch<Product>("products/", {
     method: "POST",
     body: JSON.stringify(data),

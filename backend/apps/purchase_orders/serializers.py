@@ -33,7 +33,7 @@ class PurchaseOrderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
         fields = [
-            "id", "supplier_name", "status", "total_price",
+            "id", "name", "supplier_name", "status", "total_price",
             "created_by", "created_at", "updated_at",
         ]
         read_only_fields = fields
@@ -45,7 +45,7 @@ class PurchaseOrderDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
         fields = [
-            "id", "supplier_name", "status", "total_price",
+            "id", "name", "supplier_name", "status", "total_price",
             "created_by", "created_at", "updated_at",
             "lines",
         ]
@@ -56,8 +56,8 @@ class UpsertPurchaseOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PurchaseOrder
-        fields = ["id", "supplier_name", "lines"]
-        read_only_fields = ["id"]
+        fields = ["id", "name", "supplier_name", "lines"]
+        read_only_fields = ["id", "name"]
 
     def validate(self, attrs: dict) -> dict:
         lines = attrs.get("lines", [])

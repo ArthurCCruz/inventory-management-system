@@ -4,7 +4,7 @@ import { Container, Stack, Title } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import ProductForm, { ProductFormValues } from "./components/ProductForm";
-import { useGetProduct } from "./hooks/useGetProduct";
+import { useGetProduct } from "../../utils/apiHooks/products";
 
 const editProductRequest = async ({id, data}: {id: string, data: ProductFormValues}) => {
   const response = await apiFetch<Product>(`products/${id}/`, {

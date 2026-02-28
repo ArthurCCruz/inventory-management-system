@@ -14,3 +14,14 @@ export const useGetProduct = (id: string) => {
   });
 }
 
+const listProductsRequest = async () => {
+  const response = await apiFetch<Product[]>("products/", { method: "GET" });
+  return response;
+}
+
+export const useListProducts = () => {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: listProductsRequest,
+  });
+}

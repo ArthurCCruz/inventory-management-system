@@ -1,8 +1,11 @@
 import { PublicUser } from "./user";
 
-export type Product = {
+export type ProductRecord = {
   id: number;
   name: string;
+}
+
+export type Product = ProductRecord & {
   sku: string;
   description: string;
   unit: string;

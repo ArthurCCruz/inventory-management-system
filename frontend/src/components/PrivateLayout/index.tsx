@@ -6,20 +6,34 @@ import { Link } from "react-router-dom";
 const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, logout } = useAuth();
 
+  const menus = [
+    {
+      label: "Products",
+      href: "/products",
+    },
+    {
+      label: "Purchase",
+      href: "/purchase-orders",
+    },
+  ]
+
   return (
     <AppShell header={{ height: 60 }}>
       <AppShell.Header>
         <Group justify="space-between" h="100%" px="md">
           <Group>
-            <Anchor
-              component={Link}
-              to="/products"
-              size="lg"
-              fw={700}
-              underline="never"
-            >
-              Products
-            </Anchor>
+            {menus.map((menu) => (
+              <Anchor
+                component={Link}
+                to={menu.href}
+                size="lg"
+                fw={700}
+                underline="never"
+                key={menu.href}
+              >
+                {menu.label}
+              </Anchor>
+              ))}
           </Group>
           
           {user && (

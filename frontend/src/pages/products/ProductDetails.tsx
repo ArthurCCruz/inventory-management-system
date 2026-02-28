@@ -6,7 +6,7 @@ import DetailsView from "@/components/DetailsView";
 import DetailsField from "@/components/DetailsField";
 import { SimpleGrid, Stack } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { useGetProduct } from "./hooks/useGetProduct";
+import { useGetProduct } from "../../utils/apiHooks/products";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
@@ -41,7 +41,6 @@ const ProductDetails = () => {
       label: "Delete",
       onClick: async () => {
         await deleteProductMutation.mutateAsync(id!);
-        console.log("Product deleted");
         navigate("/products");
       },
       icon: <IconTrash size={16} />,

@@ -1,62 +1,39 @@
-import { apiFetch } from "@/utils/api";
 import { Product } from "@/types/models/product";
-import { useQuery } from "@tanstack/react-query";
-import { Button, Group, Stack, Table } from "@mantine/core";
+import { Button, Group, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "@/utils/date";
-
-const productsRequest = async () => {
-  const res = await apiFetch<Product[]>("products/", { method: "GET" });
-  return res;
-}
+import DataTable, { DataColumn } from "@/components/DataTable";
+import { useListProducts } from "@/utils/apiHooks/products";
 
 const ProductList = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: productsRequest,
-  });
+  const { data, isLoading } = useListProducts();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const columns: DataColumn<Product>[] = [
+    { label: "Name", render: ({ name }) => name },
+    { label: "SKU", render: ({ sku }) => sku },
+    { label: "Description", render: ({ description }) => description },
+    { label: "Unit", render: ({ unit }) => unit },
+    { label: "Created At", render: ({ created_at }) => formatDate(created_at) },
+    { label: "Updated At", render: ({ updated_at }) => formatDate(updated_at) },
+    { label: "Created By", render: ({ created_by }) => created_by.name },
+  ];
 
   return (
     <Stack>
       <Group p="md">
         <Button leftSection={<IconPlus size={16} />} component={Link} to="/products/new">Create Product</Button>
       </Group>
-      <Table highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>SKU</Table.Th>
-            <Table.Th>Description</Table.Th>
-            <Table.Th>Unit</Table.Th>
-            <Table.Th>Created At</Table.Th>
-            <Table.Th>Updated At</Table.Th>
-            <Table.Th>Created By</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {data?.map((product) => (
-            <Table.Tr 
-              key={product.id} 
-              onClick={() => navigate(`/products/${product.id}`)}
-              style={{ cursor: 'pointer' }}
-            >
-              <Table.Td>{product.name}</Table.Td>
-              <Table.Td>{product.sku}</Table.Td>
-              <Table.Td>{product.description}</Table.Td>
-              <Table.Td>{product.unit}</Table.Td>
-              <Table.Td>{formatDate(product.created_at)}</Table.Td>
-              <Table.Td>{formatDate(product.updated_at)}</Table.Td>
-              <Table.Td>{product.created_by.name}</Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+      <DataTable
+        data={data || []}
+        columns={columns}
+        onRowClick={(product) => navigate(`/products/${product.id}`)}
+      />
     </Stack>
   )
 };

@@ -23,6 +23,10 @@ class PurchaseOrder(OwnedModel):
     supplier_name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    @property
+    def name(self):
+        return f"PO-{self.pk}".strip()
     
     if TYPE_CHECKING:
         lines: Manager[PurchaseOrderLine]
