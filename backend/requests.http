@@ -162,6 +162,20 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
 
+# @name ConfirmPurchaseOrder
+PATCH {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/confirm/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name ReceivePurchaseOrder
+PATCH {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/receive/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
 # @name CreateSaleOrder
 POST {{baseUrl}}/{{apiVersion}}/sale-orders/
 Content-Type: {{contentType}}

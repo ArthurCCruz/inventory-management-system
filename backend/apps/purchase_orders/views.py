@@ -1,4 +1,8 @@
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import transaction
 from apps.common.views import OwnedModelViewSet
 from apps.purchase_orders.serializers import PurchaseOrderDetailSerializer, PurchaseOrderListSerializer, UpsertPurchaseOrderSerializer
 from .models import PurchaseOrder
@@ -32,3 +36,19 @@ class PurchaseOrderViewSet(OwnedModelViewSet):
         order = self.get_object()
         self._ensure_draft(order)
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=["patch"])
+    @transaction.atomic
+    def confirm(self, request, pk=None):
+        order = self.get_object()
+        order.confirm()
+        serializer = UpsertPurchaseOrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["patch"])
+    @transaction.atomic
+    def receive(self, request, pk=None):
+        order = self.get_object()
+        order.receive()
+        serializer = UpsertPurchaseOrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
