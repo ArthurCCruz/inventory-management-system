@@ -3,6 +3,7 @@ import ProductList from "./ProductList";
 import CreateProduct from "./CreateProduct";
 import ProductDetails from "./ProductDetails";
 import EditProduct from "./EditProduct";
+import UpdateProductQuantity from "./UpdateProductQuantity";
 
 const Products = () => {
   return (
@@ -11,6 +12,7 @@ const Products = () => {
       <Route path="/new" element={<CreateProduct />} />
       <Route path="/:id" element={<ProductDetails />} />
       <Route path="/:id/edit" element={<EditProduct />} />
+      <Route path="/:id/update-quantity" element={<UpdateProductQuantity />} />
     </Routes>
   );
 };

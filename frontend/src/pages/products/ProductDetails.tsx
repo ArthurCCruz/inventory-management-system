@@ -73,6 +73,12 @@ const ProductDetails = () => {
     { label: "Updated At", render: ({ updated_at }) => formatDate(updated_at) },
   ];
 
+  const updateQuantityAction = {
+    label: "Update",
+    onClick: () => navigate(`/products/${id}/update-quantity`),
+    icon: <IconPencil size={16} />,
+  }
+
   return (
     <DetailsView actions={actions}>
       <SimpleGrid cols={2} spacing="lg">
@@ -92,7 +98,7 @@ const ProductDetails = () => {
       <Title order={3}>Stock</Title>
       <SimpleGrid cols={2} spacing="lg">
         <Stack gap="lg">
-          <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
+          <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} action={updateQuantityAction} />
           <DetailsField label="Reserved Quantity" value={formatNumber(data.stock_quantity.reserved_quantity)} />
         </Stack>
         <Stack gap="lg">
