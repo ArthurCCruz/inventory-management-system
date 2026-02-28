@@ -6,12 +6,8 @@ from django.db import models
 from apps.common.models import OwnedModel
 from apps.products.models import Product
 
-if TYPE_CHECKING:
-    from apps.purchase_orders.models import PurchaseOrderLine
-    from apps.sale_orders.models import SaleOrderLine
-
 class StockQuantity(OwnedModel):
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stock_quantity")
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name="stock_quantity", primary_key=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     reserved_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -53,6 +49,33 @@ class StockQuantity(OwnedModel):
         self.save(update_fields=["reserved_quantity"])
         return self
 
+    def adjust_quantity(self, new_quantity: Decimal):
+        if new_quantity < 0:
+            raise ValidationError("Stock quantity cannot be negative.")
+        if new_quantity < self.reserved_quantity:
+            raise ValidationError("Stock quantity cannot be less than reserved quantity.")
+        if new_quantity == self.quantity:
+            raise ValidationError("Stock quantity cannot be the same as current quantity.")
+
+        add_quantity = new_quantity - self.quantity
+        if add_quantity > 0:
+            to_location = StockMove.Location.STOCK
+            from_location = StockMove.Location.ADJUSTMENT
+        else:
+            to_location = StockMove.Location.ADJUSTMENT
+            from_location = StockMove.Location.STOCK
+        
+        stock_move = StockMove.objects.create(
+            product=self.product,
+            quantity=abs(add_quantity),
+            from_location=from_location,
+            to_location=to_location,
+            origin="Manual Adjustment",
+            status=StockMove.Status.PENDING,
+            created_by=self.created_by,
+        )
+        stock_move.set_done()
+
 class StockMove(OwnedModel):
     class Location(models.TextChoices):
         SUPPLIER = "supplier", "Supplier"
@@ -84,9 +107,9 @@ class StockMove(OwnedModel):
         if self.to_location == self.Location.CUSTOMER and self.status == self.Status.PENDING:
           raise ValidationError("Stock needs to be reserved first.")
         quantity_to_move = self.quantity if self.to_location == self.Location.STOCK else -self.quantity
-        self.product.stock_quantity.first().update_quantity(quantity_to_move)
+        self.product.stock_quantity.update_quantity(quantity_to_move)
         if self.to_location == self.Location.CUSTOMER:
-            self.product.stock_quantity.first().update_reserved_quantity(-self.quantity)
+            self.product.stock_quantity.update_reserved_quantity(-self.quantity)
         self.status = self.Status.DONE
         self.save(update_fields=["status"])
         return self
@@ -94,7 +117,7 @@ class StockMove(OwnedModel):
     def set_reserved(self):
         if self.status != self.Status.PENDING:
           raise ValidationError("Stock move can only be reserved while pending.")
-        self.product.stock_quantity.first().update_reserved_quantity(self.quantity)
+        self.product.stock_quantity.update_reserved_quantity(self.quantity)
         self.status = self.Status.RESERVED
         self.save(update_fields=["status"])
         return self

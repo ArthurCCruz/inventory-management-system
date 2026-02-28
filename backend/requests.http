@@ -106,6 +106,17 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
 
+# @name UpdateProductQuantity
+PATCH {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/update-quantity/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "quantity": 200
+}
+
+###
+
 # @name CreatePurchaseOrder
 POST {{baseUrl}}/{{apiVersion}}/purchase-orders/
 Content-Type: {{contentType}}
