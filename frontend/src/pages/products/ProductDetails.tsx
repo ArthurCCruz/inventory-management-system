@@ -4,9 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "@/utils/date";
 import DetailsView from "@/components/DetailsView";
 import DetailsField from "@/components/DetailsField";
-import { SimpleGrid, Stack } from "@mantine/core";
+import { Divider, SimpleGrid, Stack, Title } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useGetProduct } from "../../utils/apiHooks/products";
+import { formatNumber } from "@/utils/number";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
@@ -62,6 +63,11 @@ const ProductDetails = () => {
           <DetailsField label="Updated At" value={formatDate(data.updated_at)} />
           <DetailsField label="Created By" value={data.created_by.name} />
         </Stack>
+      </SimpleGrid>
+      <Divider my="lg" />
+      <Title order={3}>Stock</Title>
+      <SimpleGrid cols={2} spacing="lg">
+        <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
       </SimpleGrid>
     </DetailsView>
   );

@@ -1,3 +1,4 @@
+import { StockQuantity } from "./stock";
 import { PublicUser } from "./user";
 
 export type ProductRecord = {
@@ -12,4 +13,5 @@ export type Product = ProductRecord & {
   created_at: string;
   updated_at: string;
   created_by: PublicUser;
+  stock_quantity: StockQuantity;
 };
