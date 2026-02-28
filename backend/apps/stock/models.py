@@ -14,11 +14,20 @@ class StockQuantity(OwnedModel):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stock_quantity")
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     reserved_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # forecasted_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def available_quantity(self):
         return self.quantity - self.reserved_quantity
+
+    @property
+    def forecasted_quantity(self):
+        quantity = self.available_quantity
+        for move in self.product.stock_moves.filter(status=StockMove.Status.PENDING):
+            if move.to_location == StockMove.Location.STOCK:
+                quantity += move.quantity
+            else:
+                quantity -= move.quantity
+        return quantity
 
     class Meta:
         constraints = [

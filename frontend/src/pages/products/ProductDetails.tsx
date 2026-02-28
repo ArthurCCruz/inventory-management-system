@@ -93,7 +93,10 @@ const ProductDetails = () => {
         <Stack gap="lg">
           <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} />
           <DetailsField label="Reserved Quantity" value={formatNumber(data.stock_quantity.reserved_quantity)} />
+        </Stack>
+        <Stack gap="lg">
           <DetailsField label="Available Quantity" value={formatNumber(data.stock_quantity.available_quantity)} />
+          <DetailsField label="Forecasted Quantity" value={formatNumber(data.stock_quantity.forecasted_quantity)} />
         </Stack>
       </SimpleGrid>
       <Divider my="lg" />

@@ -3,6 +3,7 @@ export type StockQuantity = {
   quantity: number;
   reserved_quantity: number;
   available_quantity: number;
+  forecasted_quantity: number;
 }
 
 export type StockMove = {
