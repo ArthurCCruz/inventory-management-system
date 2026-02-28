@@ -4,7 +4,7 @@ import PurchaseOrderDetails from "./PurchaseOrderDetails";
 import CreatePurchaseOrder from "./CreatePurchaseOrder";
 import EditPurchaseOrder from "./EditPurchaseOrder";
 
-const Products = () => {
+const PurchaseOrders = () => {
   return (
     <Routes>
       <Route path="/" element={<PurchaseOrderList />} />
@@ -15,4 +15,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default PurchaseOrders;

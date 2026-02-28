@@ -12,8 +12,12 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
       href: "/products",
     },
     {
-      label: "Purchase",
+      label: "Purchases",
       href: "/purchase-orders",
+    },
+    {
+      label: "Sales",
+      href: "/sale-orders",
     },
   ]
 

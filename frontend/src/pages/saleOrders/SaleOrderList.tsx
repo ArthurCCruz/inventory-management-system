@@ -1,5 +1,5 @@
 import DataTable, { DataColumn } from "@/components/DataTable";
-import { PurchaseOrder } from "@/types/models/purchaseOrder";
+import { SaleOrder } from "@/types/models/saleOrder";
 import { apiFetch } from "@/utils/api";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
@@ -8,25 +8,25 @@ import { IconPlus } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 
-const purchaseOrdersRequest = async () => {
-  const res = await apiFetch<PurchaseOrder[]>("purchase-orders/", { method: "GET" });
+const saleOrdersRequest = async () => {
+  const res = await apiFetch<SaleOrder[]>("sale-orders/", { method: "GET" });
   return res;
 }
 
-const PurchaseOrderList = () => {
+const SaleOrderList = () => {
   const navigate = useNavigate();
   const { data, isLoading } = useQuery({
-    queryKey: ["purchase-orders"],
-    queryFn: purchaseOrdersRequest,
+    queryKey: ["sale-orders"],
+    queryFn: saleOrdersRequest,
   });
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  const columns: DataColumn<PurchaseOrder>[] = [
-    { label: "PO Number", render: ({ name }) => name },
-    { label: "Supplier Name", render: ({ supplier_name }) => supplier_name },
+  const columns: DataColumn<SaleOrder>[] = [
+    { label: "SO Number", render: ({ name }) => name },
+    { label: "Customer Name", render: ({ customer_name }) => customer_name },
     { label: "Status", render: ({ status }) => status },
     { label: "Total Price", render: ({ total_price }) => formatCurrency(total_price) },
     { label: "Created At", render: ({ created_at }) => formatDate(created_at) },
@@ -37,16 +37,16 @@ const PurchaseOrderList = () => {
   return (
     <Stack>
       <Group p="md">
-        <Button leftSection={<IconPlus size={16} />} component={Link} to="/purchase-orders/new">Create Purchase Order</Button>
+        <Button leftSection={<IconPlus size={16} />} component={Link} to="/sale-orders/new">Create Sale Order</Button>
       </Group>
       <DataTable
         data={data || []}
         columns={columns}
-        onRowClick={(purchaseOrder) => navigate(`/purchase-orders/${purchaseOrder.id}`)}
-        emptyText="You don't have any purchase orders yet."
+        onRowClick={(saleOrder) => navigate(`/sale-orders/${saleOrder.id}`)}
+        emptyText="You don't have any sale orders yet."
       />
     </Stack>
   );
 };
 
-export default PurchaseOrderList;
+export default SaleOrderList;

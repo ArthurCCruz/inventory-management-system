@@ -33,6 +33,7 @@ const ProductList = () => {
         data={data || []}
         columns={columns}
         onRowClick={(product) => navigate(`/products/${product.id}`)}
+        emptyText="You don't have any products yet."
       />
     </Stack>
   )
