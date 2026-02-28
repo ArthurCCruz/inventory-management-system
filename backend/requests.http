@@ -81,6 +81,13 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
 
+# @name GetProductMoves
+GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/moves/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
 # @name UpdateProduct
 PATCH {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
 Content-Type: {{contentType}}

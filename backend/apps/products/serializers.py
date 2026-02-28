@@ -1,9 +1,34 @@
 from rest_framework import serializers
+
+from apps.stock.serializers import StockMoveSerializer, StockQuantitySerializer
 from .models import Product
 from apps.common.serializers import RelatedRecordSerializer
 from apps.users.models import User
+
 class ProductSerializer(serializers.ModelSerializer):
     created_by = RelatedRecordSerializer(model=User, read_only=True)
+    stock_quantity = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "sku", "description", "unit", "created_at", "updated_at", "created_by", "stock_quantity"]
+        read_only_fields = fields
+
+    def get_stock_quantity(self, obj):
+        stock_qty = obj.stock_quantity.first()
+        if stock_qty:
+            return StockQuantitySerializer(stock_qty).data
+        return None
+
+class ProductMovesSerializer(serializers.ModelSerializer):
+    stock_moves = StockMoveSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Product
+        fields = ["stock_moves"]
+        read_only_fields = fields
+
+class ProductUpsertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ["id", "name", "sku", "description", "unit", "created_at", "updated_at", "created_by"]
@@ -16,4 +41,4 @@ class ProductSerializer(serializers.ModelSerializer):
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
             raise serializers.ValidationError("SKU must be unique.")
-        return sku    
+        return sku
