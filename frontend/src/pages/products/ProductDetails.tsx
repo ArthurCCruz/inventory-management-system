@@ -70,6 +70,7 @@ const ProductDetails = () => {
     { label: "Quantity", render: ({ quantity }) => quantity },
     { label: "Unit", render: () => data.unit },
     { label: "Status", render: ({ status }) => status },
+    { label: "Updated At", render: ({ updated_at }) => formatDate(updated_at) },
   ];
 
   return (

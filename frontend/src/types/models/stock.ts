@@ -14,4 +14,5 @@ export type StockMove = {
   status: string;
   origin: string;
   name: string;
+  updated_at: string;
 }
