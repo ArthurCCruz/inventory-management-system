@@ -5,12 +5,12 @@ from rest_framework import serializers
 from apps.common.serializers import RelatedRecordSerializer
 from apps.users.models import User
 
-from .models import PurchaseOrder, PurchaseOrderLine
+from .models import SaleOrder, SaleOrderLine
 from apps.products.models import Product
 
-class UpsertPurchaseOrderLineSerializer(serializers.ModelSerializer):
+class UpsertSaleOrderLineSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PurchaseOrderLine
+        model = SaleOrderLine
         fields = ["id", "product", "quantity", "unit_price", "total_price"]
         read_only_fields = ["id", "total_price"]
 
@@ -20,60 +20,52 @@ class UpsertPurchaseOrderLineSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid product.")
         return product
 
-class ReadPurchaseOrderLineSerializer(serializers.ModelSerializer):
+class ReadSaleOrderLineSerializer(serializers.ModelSerializer):
     product = RelatedRecordSerializer(model=Product, read_only=True)
     class Meta:
-        model = PurchaseOrderLine
+        model = SaleOrderLine
         fields = ["id", "product", "quantity", "unit_price", "total_price"]
         read_only_fields = fields
 
-class PurchaseOrderListSerializer(serializers.ModelSerializer):
+class SaleOrderListSerializer(serializers.ModelSerializer):
     created_by = RelatedRecordSerializer(model=User, read_only=True)
-
     class Meta:
-        model = PurchaseOrder
-        fields = [
-            "id", "name", "supplier_name", "status", "total_price",
-            "created_by", "created_at", "updated_at",
-        ]
+        model = SaleOrder
+        fields = ["id", "name", "customer_name", "status", "total_price", "created_by", "created_at", "updated_at"]
         read_only_fields = fields
 
-class PurchaseOrderDetailSerializer(serializers.ModelSerializer):
+class SaleOrderDetailSerializer(serializers.ModelSerializer):
     created_by = RelatedRecordSerializer(model=User, read_only=True)
-    lines = ReadPurchaseOrderLineSerializer(many=True, read_only=True)
+    lines = ReadSaleOrderLineSerializer(many=True, read_only=True)
 
     class Meta:
-        model = PurchaseOrder
-        fields = [
-            "id", "name", "supplier_name", "status", "total_price",
-            "created_by", "created_at", "updated_at",
-            "lines",
-        ]
+        model = SaleOrder
+        fields = ["id", "name", "customer_name", "status", "total_price", "created_by", "created_at", "updated_at", "lines"]
         read_only_fields = fields
 
-class UpsertPurchaseOrderSerializer(serializers.ModelSerializer):
-    lines = UpsertPurchaseOrderLineSerializer(many=True)
+class UpsertSaleOrderSerializer(serializers.ModelSerializer):
+    lines = UpsertSaleOrderLineSerializer(many=True)
 
     class Meta:
-        model = PurchaseOrder
-        fields = ["id", "name", "supplier_name", "lines"]
+        model = SaleOrder
+        fields = ["id", "name", "customer_name", "lines"]
         read_only_fields = ["id", "name"]
 
     def validate(self, attrs: dict) -> dict:
         lines = attrs.get("lines", [])
         if not lines or len(lines) == 0:
-            raise serializers.ValidationError("Purchase order must have at least one line.")
+            raise serializers.ValidationError("Sale order must have at least one line.")
         return attrs
 
     @transaction.atomic
-    def create(self, validated_data) -> PurchaseOrder:
+    def create(self, validated_data) -> SaleOrder:
         lines = validated_data.pop("lines", [])
         order = super().create(validated_data)
-        cast(PurchaseOrder, order).replace_lines_and_recalc(lines)
+        cast(SaleOrder, order).replace_lines_and_recalc(lines)
         return order
 
     @transaction.atomic
-    def update(self, order: PurchaseOrder, validated_data: dict) -> PurchaseOrder:
+    def update(self, order: SaleOrder, validated_data: dict) -> SaleOrder:
         lines = validated_data.pop("lines", [])
         order = super().update(order, validated_data)
         if lines and len(lines) > 0:

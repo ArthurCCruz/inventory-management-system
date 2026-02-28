@@ -152,3 +152,59 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 DELETE {{baseUrl}}/{{apiVersion}}/purchase-orders/{{CreatePurchaseOrder.response.body.$.id}}/
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name CreateSaleOrder
+POST {{baseUrl}}/{{apiVersion}}/sale-orders/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "customer_name": "Customer 1",
+    "lines": [
+        {
+            "product": "{{CreateProduct.response.body.$.id}}",
+            "quantity": 10,
+            "unit_price": 100
+        }
+    ]
+}
+
+###
+
+# @name ListSaleOrders
+GET {{baseUrl}}/{{apiVersion}}/sale-orders/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name GetSaleOrder
+GET {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name UpdateSaleOrder
+PATCH {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+{
+    "lines": [
+        {
+            "product": "{{CreateProduct.response.body.$.id}}",
+            "quantity": 20,
+            "unit_price": 100
+        }
+    ]
+}
+
+###
+
+# @name DeleteSaleOrder
+DELETE {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}

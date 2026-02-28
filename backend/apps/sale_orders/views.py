@@ -1,27 +1,27 @@
 from rest_framework.exceptions import PermissionDenied
 from apps.common.views import OwnedModelViewSet
-from apps.purchase_orders.serializers import PurchaseOrderDetailSerializer, PurchaseOrderListSerializer, UpsertPurchaseOrderSerializer
-from .models import PurchaseOrder
+from apps.sale_orders.models import SaleOrder
+from apps.sale_orders.serializers import SaleOrderDetailSerializer, SaleOrderListSerializer, UpsertSaleOrderSerializer
 
-class PurchaseOrderViewSet(OwnedModelViewSet):
-    queryset = PurchaseOrder.objects.all()
+class SaleOrderViewSet(OwnedModelViewSet):
+    queryset = SaleOrder.objects.all()
 
     def get_serializer_class(self):
         if self.action in ("create", "partial_update"):
-            return UpsertPurchaseOrderSerializer
+            return UpsertSaleOrderSerializer
         if self.action == "retrieve":
-            return PurchaseOrderDetailSerializer
-        return PurchaseOrderListSerializer
+            return SaleOrderDetailSerializer
+        return SaleOrderListSerializer
 
     def get_queryset(self):
-        qs =  super().get_queryset()
+        qs = super().get_queryset()
         if self.action in ("retrieve", "create", "partial_update"):
             qs = qs.prefetch_related("lines", "lines__product")
         return qs
 
-    def _ensure_draft(self, order: PurchaseOrder):
-        if order.status != PurchaseOrder.Status.DRAFT:
-            raise PermissionDenied("Purchase order is only editable while in draft.")
+    def _ensure_draft(self, order: SaleOrder):
+        if order.status != SaleOrder.Status.DRAFT:
+            raise PermissionDenied("Sale order is only editable while in draft.")
 
     def partial_update(self, request, *args, **kwargs):
         order = self.get_object()
