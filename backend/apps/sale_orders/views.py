@@ -44,3 +44,11 @@ class SaleOrderViewSet(OwnedModelViewSet):
         order.confirm()
         serializer = UpsertSaleOrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["patch"])
+    @transaction.atomic
+    def reserve(self, request, pk=None):
+        order = self.get_object()
+        order.reserve()
+        serializer = UpsertSaleOrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)

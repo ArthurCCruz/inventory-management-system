@@ -82,9 +82,24 @@ class SaleOrder(OwnedModel):
         
         return self
 
+    def reserve(self):
+        if self.status != self.Status.CONFIRMED:
+            raise ValidationError("Only confirmed sale orders can be reserved.")
+        
+        for line in self.lines.all():
+            for move in line.stock_move.all():
+                move.set_reserved()
+        
+        self.status = self.Status.RESERVED
+        self.save(update_fields=["status"])
+        return self
+
 class SaleOrderLine(models.Model):
     order = models.ForeignKey(SaleOrder, related_name="lines", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    if TYPE_CHECKING:
+        stock_move: Manager[StockMove]

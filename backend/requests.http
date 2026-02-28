@@ -238,3 +238,10 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
+
+# @name ReserveSaleOrder
+PATCH {{baseUrl}}/{{apiVersion}}/sale-orders/{{CreateSaleOrder.response.body.$.id}}/reserve/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###

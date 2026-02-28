@@ -13,9 +13,12 @@ if TYPE_CHECKING:
 class StockQuantity(OwnedModel):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stock_quantity")
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # available_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # reserved_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    reserved_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     # forecasted_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    @property
+    def available_quantity(self):
+        return self.quantity - self.reserved_quantity
 
     class Meta:
         constraints = [
@@ -26,14 +29,23 @@ class StockQuantity(OwnedModel):
         ]
 
     def update_quantity(self, quantity: Decimal):
-      self.quantity += quantity.quantize(Decimal("0.01"))
-      if self.quantity < 0:
-        raise ValidationError("Stock quantity cannot be negative.")
-      if self.quantity == 0:
-        self.delete()
-        return None
-      self.save(update_fields=["quantity"])
-      return self
+        self.quantity += quantity.quantize(Decimal("0.01"))
+        if self.quantity < 0:
+            raise ValidationError("Stock quantity cannot be negative.")
+        if self.quantity == 0:
+            self.delete()
+            return None
+        self.save(update_fields=["quantity"])
+        return self
+
+    def update_reserved_quantity(self, quantity: Decimal):
+        self.reserved_quantity += quantity.quantize(Decimal("0.01"))
+        if self.reserved_quantity < 0:
+            raise ValidationError("Reserved stock quantity cannot be negative.")
+        if self.reserved_quantity > self.quantity:
+            raise ValidationError("Reserved stock quantity cannot be greater than stock quantity.")
+        self.save(update_fields=["reserved_quantity"])
+        return self
 
 class StockMove(OwnedModel):
     class Location(models.TextChoices):
@@ -70,4 +82,11 @@ class StockMove(OwnedModel):
         self.status = self.Status.DONE
         self.save(update_fields=["status"])
         return self
-    
+
+    def set_reserved(self):
+        if self.status != self.Status.PENDING:
+          raise ValidationError("Stock move can only be reserved while pending.")
+        self.product.stock_quantity.first().update_reserved_quantity(self.quantity)
+        self.status = self.Status.RESERVED
+        self.save(update_fields=["status"])
+        return self
