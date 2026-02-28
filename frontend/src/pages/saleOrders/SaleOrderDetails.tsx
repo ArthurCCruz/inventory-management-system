@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DetailsView from "@/components/DetailsView";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiFetch } from "@/utils/api";
 import { Group, SimpleGrid, Stack } from "@mantine/core";
@@ -16,14 +16,56 @@ const deleteSaleOrderRequest = async (id: string) => {
   return response;
 }
 
+const confirmSaleOrderRequest = async (id: string) => {
+  const response = await apiFetch(`sale-orders/${id}/confirm/`, { method: "PATCH" });
+  return response;
+}
+
+const reserveSaleOrderRequest = async (id: string) => {
+  const response = await apiFetch(`sale-orders/${id}/reserve/`, { method: "PATCH" });
+  return response;
+}
+
+const deliverSaleOrderRequest = async (id: string) => {
+  const response = await apiFetch(`sale-orders/${id}/deliver/`, { method: "PATCH" });
+  return response;
+}
+
 const SaleOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading } = useGetSaleOrder(id!);
+  const { data, isLoading, refetch } = useGetSaleOrder(id!);
 
   const deleteSaleOrderMutation = useMutation({
     mutationFn: deleteSaleOrderRequest,
   });
+
+  const confirmSaleOrderMutation = useMutation({
+    mutationFn: confirmSaleOrderRequest,
+  });
+
+  const reserveSaleOrderMutation = useMutation({
+    mutationFn: reserveSaleOrderRequest,
+  });
+
+  const deliverSaleOrderMutation = useMutation({
+    mutationFn: deliverSaleOrderRequest,
+  });
+
+  const confirmSaleOrder = async () => {
+    await confirmSaleOrderMutation.mutateAsync(id!);
+    refetch();
+  }
+
+  const reserveSaleOrder = async () => {
+    await reserveSaleOrderMutation.mutateAsync(id!);
+    refetch();
+  }
+
+  const deliverSaleOrder = async () => {
+    await deliverSaleOrderMutation.mutateAsync(id!);
+    refetch();
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -33,22 +75,51 @@ const SaleOrderDetails = () => {
     return <div>Sale order not found</div>;
   }
 
-  const actions = [
-    {
-      label: "Edit",
-      onClick: () => navigate(`/sale-orders/${id}/edit`),
-      icon: <IconPencil size={16} />,
-    },
-    {
-      label: "Delete",
-      onClick: async () => {
-        await deleteSaleOrderMutation.mutateAsync(id!);
-        navigate("/sale-orders");
+  const actions = []
+
+  if (data.status === "draft") {
+    actions.push(
+      {
+        label: "Edit",
+        onClick: () => navigate(`/sale-orders/${id}/edit`),
+        icon: <IconPencil size={16} />,
       },
-      icon: <IconTrash size={16} />,
-      color: "red",
-    },
-  ];
+      {
+        label: "Confirm",
+        onClick: confirmSaleOrder,
+        icon: <IconCheck size={16} />,
+      },
+      {
+        label: "Delete",
+        onClick: async () => {
+          await deleteSaleOrderMutation.mutateAsync(id!);
+          navigate("/sale-orders");
+        },
+        icon: <IconTrash size={16} />,
+        color: "red",
+      }
+    )
+  }
+
+  if (data.status === "confirmed") {
+    actions.push(
+      {
+        label: "Reserve",
+        onClick: reserveSaleOrder,
+        icon: <IconCheck size={16} />,
+      },
+    )
+  }
+
+  if (data.status === "reserved") {
+    actions.push(
+      {
+        label: "Deliver",
+        onClick: deliverSaleOrder,
+        icon: <IconCheck size={16} />,
+      },
+    )
+  }
 
   const lineColumns: DataColumn<SaleOrderLine>[] = [
     { label: "Product", render: ({ product }) => product.name },
