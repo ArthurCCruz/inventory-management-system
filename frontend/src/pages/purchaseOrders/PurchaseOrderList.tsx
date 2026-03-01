@@ -7,6 +7,7 @@ import { Button, Group, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import Loading from "@/components/Loading";
 
 const purchaseOrdersRequest = async () => {
   const res = await apiFetch<PurchaseOrder[]>("purchase-orders/", { method: "GET" });
@@ -21,7 +22,7 @@ const PurchaseOrderList = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const columns: DataColumn<PurchaseOrder>[] = [

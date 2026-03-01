@@ -10,6 +10,7 @@ import { formatDate } from "@/utils/date";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import { useGetSaleOrder } from "@/utils/apiHooks/saleOrder";
 import { SaleOrderLine } from "@/types/models/saleOrder";
+import Loading from "@/components/Loading";
 
 const deleteSaleOrderRequest = async (id: string) => {
   const response = await apiFetch(`sale-orders/${id}/`, { method: "DELETE" });
@@ -68,7 +69,7 @@ const SaleOrderDetails = () => {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!data) {

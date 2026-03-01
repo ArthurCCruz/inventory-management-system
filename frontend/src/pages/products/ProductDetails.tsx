@@ -13,6 +13,7 @@ import ExpandableTable from "@/components/ExpandableTable";
 import { StockMove, StockMoveLine, StockQuantity } from "@/types/models/stock";
 import { useGetProductQuantity } from "@/utils/apiHooks/stock";
 import { formatCurrency } from "@/utils/currency";
+import Loading from "@/components/Loading";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
@@ -45,7 +46,7 @@ const ProductDetails = () => {
   const { data: financialData, isLoading: isLoadingFinancialData } = useGetProductFinancialData(id!);
 
   if (isLoading || isLoadingStockMoves || isLoadingStockQuantity || isLoadingFinancialData) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!data) {

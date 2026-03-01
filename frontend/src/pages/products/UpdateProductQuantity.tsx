@@ -2,6 +2,7 @@ import { Container, Stack, Title } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import UpdateQuantityForm from "./components/UpdateQuantityForm";
 import { useGetProductLots, useGetProductQuantity } from "@/utils/apiHooks/stock";
+import Loading from "@/components/Loading";
 
 const UpdateProductQuantity = () => {
   const { id } = useParams();
@@ -9,7 +10,7 @@ const UpdateProductQuantity = () => {
   const { data: lotList, isLoading: isLoadingLotList } = useGetProductLots(id!);
 
   if (isLoading || isLoadingLotList) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!data || !lotList) {

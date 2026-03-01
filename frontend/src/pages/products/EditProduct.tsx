@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import ProductForm, { ProductFormValues } from "./components/ProductForm";
 import { useGetProduct } from "../../utils/apiHooks/products";
+import Loading from "@/components/Loading";
 
 const editProductRequest = async ({id, data}: {id: string, data: ProductFormValues}) => {
   const response = await apiFetch<Product>(`products/${id}/`, {
@@ -29,7 +30,7 @@ const EditProduct = () => {
   const { data, isLoading } = useGetProduct(id!);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!data) {

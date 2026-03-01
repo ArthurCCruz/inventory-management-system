@@ -10,6 +10,7 @@ import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import { PurchaseOrderLine } from "@/types/models/purchaseOrder";
+import Loading from "@/components/Loading";
 
 const deletePurchaseOrderRequest = async (id: string) => {
   const response = await apiFetch(`purchase-orders/${id}/`, { method: "DELETE" });
@@ -54,7 +55,7 @@ const PurchaseOrderDetails = () => {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!data) {

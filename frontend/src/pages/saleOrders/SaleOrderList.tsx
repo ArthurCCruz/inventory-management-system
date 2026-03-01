@@ -1,4 +1,5 @@
 import DataTable, { DataColumn } from "@/components/DataTable";
+import Loading from "@/components/Loading";
 import { SaleOrder } from "@/types/models/saleOrder";
 import { apiFetch } from "@/utils/api";
 import { formatCurrency } from "@/utils/currency";
@@ -21,7 +22,7 @@ const SaleOrderList = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const columns: DataColumn<SaleOrder>[] = [

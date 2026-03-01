@@ -6,13 +6,14 @@ import { formatDate } from "@/utils/date";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import { useListProducts } from "@/utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
+import Loading from "@/components/Loading";
 
 const ProductList = () => {
   const navigate = useNavigate();
   const { data, isLoading } = useListProducts();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const columns: DataColumn<Product>[] = [
