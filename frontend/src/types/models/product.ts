@@ -15,3 +15,19 @@ export type Product = ProductRecord & {
   created_by: PublicUser;
   stock_quantity_totals: StockQuantityTotals;
 };
+
+export type ProductFinancialData = {
+  stock_value: number;
+  stock_units: number;
+  stock_unit_price: number;
+  purchased_units: number;
+  purchased_value: number;
+  sold_units: number;
+  sold_value: number;
+  cogs: number;
+  gross_profit: number;
+  margin: number;
+  write_off_units: number;
+  write_off_value: number;
+  adjustment_in_value: number;
+};

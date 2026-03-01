@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.products.services import calculate_financial_data
 from apps.stock.serializers import StockLotSerializer, StockMoveSerializer, StockQuantitySerializer
 from apps.stock.models import StockMove
 from .models import Product
@@ -53,6 +54,17 @@ class ProductMovesSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["stock_moves"]
         read_only_fields = fields
+
+class ProductFinancialDataSerializer(serializers.ModelSerializer):
+    financial_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ["financial_data"]
+        read_only_fields = fields
+
+    def get_financial_data(self, obj):
+        return calculate_financial_data(obj)
 
 class ProductUpsertSerializer(serializers.ModelSerializer):
     class Meta:

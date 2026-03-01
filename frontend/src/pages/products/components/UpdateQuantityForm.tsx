@@ -19,6 +19,7 @@ interface StockQuantityLine {
   stock_lot_id?: number;
   create_new_lot: boolean;
   is_existing: boolean;
+  unit_price?: number;
 }
 
 const updateQuantityRequest = async (data: { productId: string, lines: StockQuantityLine[] }) => {
@@ -54,6 +55,17 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
           const line = values.lines[index];
           if (!line.is_existing && !line.create_new_lot && !value) {
             return "Please select a lot or choose to create a new one";
+          }
+          return null;
+        },
+        unit_price: (value, values, path) => {
+          const index = parseInt(path.split('.')[1]);
+          const line = values.lines[index];
+          if (line.create_new_lot && (value === undefined || value === null)) {
+            return "Unit price is required when creating a new lot";
+          }
+          if (line.create_new_lot && value && value < 0) {
+            return "Unit price must be 0 or greater";
           }
           return null;
         },
@@ -137,16 +149,32 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
                   </Group>
 
                   {!line.is_existing && (
-                    <Checkbox
-                      label="Create new lot for this quantity"
-                      {...form.getInputProps(`lines.${index}.create_new_lot`, { type: 'checkbox' })}
-                      onChange={(event) => {
-                        form.setFieldValue(`lines.${index}.create_new_lot`, event.currentTarget.checked);
-                        if (event.currentTarget.checked) {
-                          form.setFieldValue(`lines.${index}.stock_lot_id`, undefined);
-                        }
-                      }}
-                    />
+                    <>
+                      <Checkbox
+                        label="Create new lot for this quantity"
+                        {...form.getInputProps(`lines.${index}.create_new_lot`, { type: 'checkbox' })}
+                        onChange={(event) => {
+                          form.setFieldValue(`lines.${index}.create_new_lot`, event.currentTarget.checked);
+                          if (event.currentTarget.checked) {
+                            form.setFieldValue(`lines.${index}.stock_lot_id`, undefined);
+                          } else {
+                            form.setFieldValue(`lines.${index}.unit_price`, undefined);
+                          }
+                        }}
+                      />
+                      
+                      {line.create_new_lot && (
+                        <NumberInput
+                          label="Unit Price"
+                          placeholder="0.00"
+                          required
+                          min={0}
+                          decimalScale={2}
+                          fixedDecimalScale
+                          {...form.getInputProps(`lines.${index}.unit_price`)}
+                        />
+                      )}
+                    </>
                   )}
                 </Stack>
               </Paper>

@@ -10,6 +10,7 @@ class UpdateProductQuantityData(TypedDict):
     quantity: str
     stock_lot_id: int | None
     create_new_lot: bool | None
+    unit_price: Decimal | None
 
 def update_product_quantity(product: Product, data: list[UpdateProductQuantityData]):
     new_lot_quantity: list[UpdateProductQuantityData] = []
@@ -42,9 +43,13 @@ def update_product_quantity(product: Product, data: list[UpdateProductQuantityDa
             increasing_quantity.append((new_quantity, lot))
 
     for item in new_lot_quantity:
+        if item["unit_price"] is None:
+          raise ValidationError("Unit price is required for new lots.")
+        if item["unit_price"] < 0:
+          raise ValidationError("Unit price must be 0 or greater for new lots.")
         new_quantity = Decimal(item["quantity"])
-        lot = StockLot.objects.create(product=product, created_by=product.created_by)
-        increasing_quantity.append((new_quantity, lot))
+        lot = StockLot.objects.create(product=product, created_by=product.created_by, unit_price=item["unit_price"])
+        increasing_quantity.append((new_quantity, lot))  
         
     if decreasing_quantity:
         perform_stock_moves(product, decreasing_quantity, StockMove.Location.STOCK, StockMove.Location.ADJUSTMENT)
@@ -71,3 +76,71 @@ def perform_stock_moves(product: Product, quantities: list[tuple[Decimal, StockL
         )
     stock_move.set_done()
     return stock_move
+
+def calculate_financial_data(product: Product):
+    stock_value = sum(
+        stock_quantity.stock_lot.unit_price * stock_quantity.quantity
+        for stock_quantity in product.stock_quantity.all()
+    )
+    stock_units = sum(stock_quantity.quantity for stock_quantity in product.stock_quantity.all())
+    stock_unit_price = stock_value / stock_units if stock_units else Decimal(0)
+    
+    purchased_units = sum(
+        stock_move.quantity
+        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.SUPPLIER, status=StockMove.Status.DONE)
+    )
+    purchased_value = sum(
+        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
+        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.SUPPLIER, status=StockMove.Status.DONE)
+        for stock_move_line in stock_move.stock_move_lines.all()
+    )
+
+    sold_units = sum(
+        stock_move.quantity
+        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
+    )
+    sold_value = sum(
+        stock_move.sale_order_line.unit_price * stock_move.quantity
+        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
+    )
+    
+    cogs = sum(
+        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
+        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
+        for stock_move_line in stock_move.stock_move_lines.all()
+    )
+
+    gross_profit = sold_value - cogs
+    margin = (gross_profit / cogs) * 100 if cogs else Decimal(0)
+
+    write_off_units = sum(
+        stock_move.quantity
+        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
+    )
+    write_off_value = sum(
+        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
+        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
+        for stock_move_line in stock_move.stock_move_lines.all()
+    )
+
+    adjustment_in_value = sum(
+        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
+        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
+        for stock_move_line in stock_move.stock_move_lines.all()
+    )
+
+    return {
+        "stock_value": stock_value,
+        "stock_units": stock_units,
+        "stock_unit_price": stock_unit_price,
+        "purchased_units": purchased_units,
+        "purchased_value": purchased_value,
+        "sold_units": sold_units,
+        "sold_value": sold_value,
+        "cogs": cogs,
+        "gross_profit": gross_profit,
+        "margin": margin,
+        "write_off_units": write_off_units,
+        "write_off_value": write_off_value,
+        "adjustment_in_value": adjustment_in_value,
+    }

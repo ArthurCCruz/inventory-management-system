@@ -6,7 +6,7 @@ from apps.common.views import OwnedModelViewSet
 from apps.products.services import update_product_quantity
 from apps.stock.serializers import StockQuantitySerializer, UpdateStockQuantitySerializer
 from .models import Product
-from .serializers import ProductLotSerializer, ProductSerializer, ProductMovesSerializer, ProductStockQuantitySerializer, ProductUpsertSerializer
+from .serializers import ProductFinancialDataSerializer, ProductLotSerializer, ProductSerializer, ProductMovesSerializer, ProductStockQuantitySerializer, ProductUpsertSerializer
 from typing import cast
 
 class ProductViewSet(OwnedModelViewSet):
@@ -41,3 +41,9 @@ class ProductViewSet(OwnedModelViewSet):
         product = cast(Product, self.get_object())
         update_product_quantity(product, request.data)
         return Response(status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="financial-data")
+    def financial_data(self, request, pk=None):
+        product = self.get_object()
+        serializer = ProductFinancialDataSerializer(product)
+        return Response(serializer.data["financial_data"], status=status.HTTP_200_OK)

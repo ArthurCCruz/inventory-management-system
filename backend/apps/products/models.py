@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from apps.common.models import OwnedModel, Unit
 from typing import TYPE_CHECKING

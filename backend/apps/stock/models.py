@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 class StockLot(OwnedModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="stock_lots")
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     if TYPE_CHECKING:
         stock_quantity: StockQuantity
@@ -118,7 +119,11 @@ class StockMove(OwnedModel):
             return f"ADJ/OUT-{self.pk}".strip()
 
     def set_done_generating_lots(self):
-        lot = StockLot.objects.create(product=self.product, created_by=self.created_by)
+        lot = StockLot.objects.create(
+            product=self.product,
+            created_by=self.created_by,
+            unit_price=self.purchase_order_line.unit_price,
+        )
         StockMoveLine.objects.create(
             stock_move=self,
             product=self.product,

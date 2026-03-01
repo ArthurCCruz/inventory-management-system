@@ -1,4 +1,4 @@
-import { Product } from "@/types/models/product";
+import { Product, ProductFinancialData } from "@/types/models/product";
 import { apiFetch } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 
@@ -23,5 +23,17 @@ export const useListProducts = () => {
   return useQuery({
     queryKey: ["products"],
     queryFn: listProductsRequest,
+  });
+}
+
+const getProductFinancialDataRequest = async (id: string) => {
+  const response = await apiFetch<ProductFinancialData>(`products/${id}/financial-data/`, { method: "GET" });
+  return response;
+}
+
+export const useGetProductFinancialData = (id: string) => {
+  return useQuery({
+    queryKey: ["product-financial-data", id],
+    queryFn: () => getProductFinancialDataRequest(id),
   });
 }

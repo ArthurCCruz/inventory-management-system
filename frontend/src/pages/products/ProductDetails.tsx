@@ -6,12 +6,13 @@ import DetailsView from "@/components/DetailsView";
 import DetailsField from "@/components/DetailsField";
 import { Divider, SimpleGrid, Stack, Title } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { useGetProduct } from "../../utils/apiHooks/products";
+import { useGetProduct, useGetProductFinancialData } from "../../utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import ExpandableTable from "@/components/ExpandableTable";
 import { StockMove, StockMoveLine, StockQuantity } from "@/types/models/stock";
 import { useGetProductQuantity } from "@/utils/apiHooks/stock";
+import { formatCurrency } from "@/utils/currency";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
@@ -41,7 +42,9 @@ const ProductDetails = () => {
 
   const { data: stockQuantity, isLoading: isLoadingStockQuantity } = useGetProductQuantity(id!);
 
-  if (isLoading || isLoadingStockMoves || isLoadingStockQuantity) {
+  const { data: financialData, isLoading: isLoadingFinancialData } = useGetProductFinancialData(id!);
+
+  if (isLoading || isLoadingStockMoves || isLoadingStockQuantity || isLoadingFinancialData) {
     return <div>Loading...</div>;
   }
 
@@ -125,6 +128,26 @@ const ProductDetails = () => {
         </Stack>
       </SimpleGrid>
       <DataTable data={stockQuantity || []} columns={stockQuantityColumns} emptyText="No stock quantity found." />
+      <Divider my="lg" />
+      <Title order={3}>Financial Data</Title>
+      <SimpleGrid cols={2} spacing="lg">
+        <Stack gap="lg">
+          <DetailsField label="Stock Unit Price" value={formatCurrency(financialData?.stock_unit_price || 0)} />
+          <DetailsField label="Stock Value" value={formatCurrency(financialData?.stock_value || 0)} />
+          <DetailsField label="Write Off Units" value={`${formatNumber(financialData?.write_off_units || 0)} ${data.unit}`} />
+          <DetailsField label="Write Off Value" value={formatCurrency(financialData?.write_off_value || 0)} />
+          <DetailsField label="Adjustment-In Value" value={formatCurrency(financialData?.adjustment_in_value || 0)} />
+        </Stack>
+        <Stack gap="lg">
+          <DetailsField label="Purchased Units" value={`${formatNumber(financialData?.purchased_units || 0)} ${data.unit}`} />
+          <DetailsField label="Purchased Value" value={formatCurrency(financialData?.purchased_value || 0)} />
+          <DetailsField label="Sold Units" value={`${formatNumber(financialData?.sold_units || 0)} ${data.unit}`} />
+          <DetailsField label="Sold Value" value={formatCurrency(financialData?.sold_value || 0)} />
+          <DetailsField label="COGS" value={formatCurrency(financialData?.cogs || 0)} />
+          <DetailsField label="Gross Profit" value={formatCurrency(financialData?.gross_profit || 0)} />
+          <DetailsField label="Margin" value={`${formatNumber(financialData?.margin || 0)}%`} />
+        </Stack>
+      </SimpleGrid>
       <Divider my="lg" />
       <Title order={3}>Stock Moves</Title>
       <ExpandableTable 
