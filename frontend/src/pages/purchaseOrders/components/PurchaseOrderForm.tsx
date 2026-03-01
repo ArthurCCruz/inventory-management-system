@@ -3,19 +3,11 @@ import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useListProducts } from "@/utils/apiHooks/products";
-
-export interface PurchaseOrderFormValues {
-  supplier_name: string;
-  lines: {
-    product: string;
-    quantity: number;
-    unit_price: number;
-  }[];
-}
+import { UpsertPurchaseOrderData } from "@/utils/apiHooks/purchaseOrders";
 
 interface PurchaseOrderFormProps {
-  onSubmit: (values: PurchaseOrderFormValues) => void;
-  initialValues?: PurchaseOrderFormValues;
+  onSubmit: (values: UpsertPurchaseOrderData) => void;
+  initialValues?: UpsertPurchaseOrderData;
   isLoading: boolean;
 }
 

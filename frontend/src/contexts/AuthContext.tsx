@@ -1,13 +1,8 @@
 import React, { createContext, useContext } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/types/models/user";
-import { apiFetch, getAccessToken, refreshAccessToken, setAccessToken } from "@/utils/api";
-
-
-type LoginData = {
-  username: string;
-  password: string;
-};
+import { setAccessToken } from "@/utils/api";
+import { fetchMeKey, LoginData, useFetchMe, useLogin, useLogout } from "@/utils/apiHooks/auth";
 
 type AuthContextValue = {
   user: User | null;
@@ -21,69 +16,26 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const fetchMe = async (): Promise<User | null> => {
-  if (!getAccessToken()) {
-    const accessToken = await refreshAccessToken();
-    if (!accessToken) {
-      return null;
-    }
-  }
-  const res = await apiFetch<User>("auth/me/", { method: "GET" });
-  return res;
-}
-
-type LoginResponse = {
-  access: string;
-  user: User;
-};
-
-const loginRequest = async (data: LoginData): Promise<LoginResponse> => {
-  const res = await apiFetch<LoginResponse>("auth/login/", {
-    method: "POST",
-    credentials: "include",
-    body: JSON.stringify(data),
-  });
-  return res;
-}
-
-type LogoutResponse = {
-  detail: string;
-};
-
-const logoutRequest = async (): Promise<LogoutResponse> => {
-  const res = await apiFetch<LogoutResponse>("auth/logout/", {
-    method: "POST",
-    credentials: "include",
-  });
-  return res;
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const qc = useQueryClient();
 
   // Query: current user (me)
-  const meQuery = useQuery({
-    queryKey: ["me"],
-    queryFn: fetchMe,
-  });
+  const meQuery = useFetchMe();
 
   // Mutation: login
-  const loginMutation = useMutation({
-    mutationFn: loginRequest,
-    onSuccess: async (data) => {
-      // store access in memory
+  const loginMutation = useLogin({
+    onSuccess: (data) => {
       setAccessToken(data.access);
-      // update cache immediately
-      qc.setQueryData(["me"], data.user);
+      qc.setQueryData([fetchMeKey], data.user);
     },
   });
 
   // Mutation: logout
-  const logoutMutation = useMutation({
-    mutationFn: logoutRequest,
-    onSuccess: async () => {
+  const logoutMutation = useLogout({ 
+    onSuccess: () => {
       setAccessToken(null);
-      qc.removeQueries({ queryKey: ["me"] });
+      qc.removeQueries({ queryKey: [fetchMeKey] });
     },
   });
 

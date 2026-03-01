@@ -1,27 +1,16 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
+import { useEditPurchaseOrder, useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
 import { Container, Stack, Title } from "@mantine/core";
 import PurchaseOrderForm from "./components/PurchaseOrderForm";
-import { PurchaseOrderFormValues } from "./components/PurchaseOrderForm";
-import { apiFetch } from "@/utils/api";
-import { PurchaseOrder } from "@/types/models/purchaseOrder";
-import { useMutation } from "@tanstack/react-query";
-
-
-const editPurchaseOrderRequest = async ({id, data}: {id: string, data: PurchaseOrderFormValues}) => {
-  const response = await apiFetch<PurchaseOrder>(`purchase-orders/${id}/`, { method: "PATCH", body: JSON.stringify(data) });
-  return response;
-}
+import { UpsertPurchaseOrderData } from "@/utils/apiHooks/purchaseOrders";
 
 const EditPurchaseOrder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const mutation = useMutation({
-    mutationFn: editPurchaseOrderRequest,
-  });
+  const editPurchaseOrderMutation = useEditPurchaseOrder(id!);
 
-  const handleSubmit = async (values: PurchaseOrderFormValues) => {
-    await mutation.mutateAsync({ id: id!, data: values });
+  const handleSubmit = async (values: UpsertPurchaseOrderData) => {
+    await editPurchaseOrderMutation.mutateAsync(values);
     navigate(`/purchase-orders/${id}`);
   }
 
@@ -41,7 +30,7 @@ const EditPurchaseOrder = () => {
     <Container size="md">
       <Stack>
         <Title order={1}>Edit Purchase Order</Title>
-        <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} isLoading={mutation.isPending} />
+        <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} isLoading={editPurchaseOrderMutation.isPending} />
       </Stack>
     </Container>
   );

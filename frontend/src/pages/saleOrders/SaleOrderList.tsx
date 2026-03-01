@@ -1,25 +1,16 @@
 import DataTable, { DataColumn } from "@/components/DataTable";
 import Loading from "@/components/Loading";
 import { SaleOrder } from "@/types/models/saleOrder";
-import { apiFetch } from "@/utils/api";
+import { useListSaleOrders } from "@/utils/apiHooks/saleOrder";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { Button, Group, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-
-const saleOrdersRequest = async () => {
-  const res = await apiFetch<SaleOrder[]>("sale-orders/", { method: "GET" });
-  return res;
-}
 
 const SaleOrderList = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
-    queryKey: ["sale-orders"],
-    queryFn: saleOrdersRequest,
-  });
+  const { data, isLoading } = useListSaleOrders();
 
   if (isLoading) {
     return <Loading />;

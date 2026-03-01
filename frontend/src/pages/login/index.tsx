@@ -44,6 +44,7 @@ const Login = () => {
                 label="Password"
                 placeholder="Password"
                 required
+                type="password"
                 {...form.getInputProps("password")}
               />
               <Button type="submit">Send</Button>

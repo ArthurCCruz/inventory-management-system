@@ -1,70 +1,38 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DetailsView from "@/components/DetailsView";
 import { IconCheck, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
-import { apiFetch } from "@/utils/api";
 import { Group, SimpleGrid, Stack } from "@mantine/core";
 import DetailsField from "@/components/DetailsField";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import DataTable, { DataColumn } from "@/components/DataTable";
-import { useGetSaleOrder } from "@/utils/apiHooks/saleOrder";
+import { useConfirmSaleOrder, useDeleteSaleOrder, useDeliverSaleOrder, useGetSaleOrder, useReserveSaleOrder } from "@/utils/apiHooks/saleOrder";
 import { SaleOrderLine } from "@/types/models/saleOrder";
 import Loading from "@/components/Loading";
 
-const deleteSaleOrderRequest = async (id: string) => {
-  const response = await apiFetch(`sale-orders/${id}/`, { method: "DELETE" });
-  return response;
-}
-
-const confirmSaleOrderRequest = async (id: string) => {
-  const response = await apiFetch(`sale-orders/${id}/confirm/`, { method: "PATCH" });
-  return response;
-}
-
-const reserveSaleOrderRequest = async (id: string) => {
-  const response = await apiFetch(`sale-orders/${id}/reserve/`, { method: "PATCH" });
-  return response;
-}
-
-const deliverSaleOrderRequest = async (id: string) => {
-  const response = await apiFetch(`sale-orders/${id}/deliver/`, { method: "PATCH" });
-  return response;
-}
 
 const SaleOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useGetSaleOrder(id!);
 
-  const deleteSaleOrderMutation = useMutation({
-    mutationFn: deleteSaleOrderRequest,
-  });
-
-  const confirmSaleOrderMutation = useMutation({
-    mutationFn: confirmSaleOrderRequest,
-  });
-
-  const reserveSaleOrderMutation = useMutation({
-    mutationFn: reserveSaleOrderRequest,
-  });
-
-  const deliverSaleOrderMutation = useMutation({
-    mutationFn: deliverSaleOrderRequest,
-  });
+  const deleteSaleOrderMutation = useDeleteSaleOrder(id!);
+  const confirmSaleOrderMutation = useConfirmSaleOrder(id!);
+  const reserveSaleOrderMutation = useReserveSaleOrder(id!);
+  const deliverSaleOrderMutation = useDeliverSaleOrder(id!);
 
   const confirmSaleOrder = async () => {
-    await confirmSaleOrderMutation.mutateAsync(id!);
+    await confirmSaleOrderMutation.mutateAsync();
     refetch();
   }
 
   const reserveSaleOrder = async () => {
-    await reserveSaleOrderMutation.mutateAsync(id!);
+    await reserveSaleOrderMutation.mutateAsync();
     refetch();
   }
 
   const deliverSaleOrder = async () => {
-    await deliverSaleOrderMutation.mutateAsync(id!);
+    await deliverSaleOrderMutation.mutateAsync();
     refetch();
   }
 
@@ -93,7 +61,7 @@ const SaleOrderDetails = () => {
       {
         label: "Delete",
         onClick: async () => {
-          await deleteSaleOrderMutation.mutateAsync(id!);
+          await deleteSaleOrderMutation.mutateAsync();
           navigate("/sale-orders");
         },
         icon: <IconTrash size={16} />,

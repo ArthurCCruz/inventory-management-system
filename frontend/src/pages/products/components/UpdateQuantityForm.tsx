@@ -3,9 +3,8 @@ import { Button, NumberInput, Stack, Select, Box, Text, Paper, Group, ActionIcon
 import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { apiFetch } from "@/utils/api";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { UpdateProductQuantityData, useUpdateProductQuantity } from "@/utils/apiHooks/products";
 
 interface UpdateQuantityFormProps {
   quantityList: StockQuantity[];
@@ -13,25 +12,9 @@ interface UpdateQuantityFormProps {
   productId: string;
 }
 
-interface StockQuantityLine {
-  id?: number;
-  quantity: number;
-  stock_lot_id?: number;
-  create_new_lot: boolean;
-  is_existing: boolean;
-  unit_price?: number;
-}
-
-const updateQuantityRequest = async (data: { productId: string, lines: StockQuantityLine[] }) => {
-  return apiFetch<void>(`products/${data.productId}/update-quantity/`, {
-    method: "PATCH",
-    body: JSON.stringify(data.lines),
-  });
-}
-
 const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList, productId }) => {
   const navigate = useNavigate();
-  const form = useForm<{ lines: StockQuantityLine[] }>({
+  const form = useForm<{ lines: UpdateProductQuantityData[] }>({
     initialValues: {
       lines: quantityList.length > 0 
         ? quantityList.map(sq => ({
@@ -91,12 +74,10 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
     form.removeListItem("lines", index);
   };
 
-  const updateQuantityMutation = useMutation({
-    mutationFn: updateQuantityRequest,
-  });
+  const updateQuantityMutation = useUpdateProductQuantity(productId);
 
-  const handleSubmit = async (values: { lines: StockQuantityLine[] }) => {
-    await updateQuantityMutation.mutateAsync({ productId: productId, lines: values.lines });
+  const handleSubmit = async (values: { lines: UpdateProductQuantityData[] }) => {
+    await updateQuantityMutation.mutateAsync(values.lines);
     navigate(`/products/${productId}`);
   };
 

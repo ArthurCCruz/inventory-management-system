@@ -1,25 +1,6 @@
 import { Container, Title, Stack, Card, TextInput, Button } from "@mantine/core"
 import { useForm } from "@mantine/form";
-import { useMutation } from "@tanstack/react-query";
-import { apiFetch } from "../../utils/api";
-
-const signupUser = async (data: {
-  firstName: string;
-  lastName: string;
-  username: string;
-  password: string;
-}) => {
-  const response = await apiFetch("users/", {
-    method: "POST",
-    body: JSON.stringify({
-      first_name: data.firstName,
-      last_name: data.lastName,
-      username: data.username,
-      password: data.password,
-    }),
-  });
-  return response;
-}
+import { SignupData, useSignup } from "@/utils/apiHooks/auth";
 
 const Signup = () => {
   const form = useForm({
@@ -59,12 +40,10 @@ const Signup = () => {
     validateInputOnChange: true,
   });
 
-  const mutation = useMutation({
-    mutationFn: signupUser,
-  });
+  const signupMutation = useSignup();
 
-  const handleSubmit = (values: typeof form.values) => {
-    mutation.mutate(values);
+  const handleSubmit = async (values: SignupData) => {
+    await signupMutation.mutateAsync(values);
   };
 
   return (

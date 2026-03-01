@@ -1,9 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
+import { useConfirmPurchaseOrder, useReceivePurchaseOrder, useDeletePurchaseOrder, useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
 import DetailsView from "@/components/DetailsView";
 import { IconCheck, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
-import { apiFetch } from "@/utils/api";
 import { SimpleGrid, Stack } from "@mantine/core";
 import DetailsField from "@/components/DetailsField";
 import { formatCurrency } from "@/utils/currency";
@@ -12,45 +10,22 @@ import DataTable, { DataColumn } from "@/components/DataTable";
 import { PurchaseOrderLine } from "@/types/models/purchaseOrder";
 import Loading from "@/components/Loading";
 
-const deletePurchaseOrderRequest = async (id: string) => {
-  const response = await apiFetch(`purchase-orders/${id}/`, { method: "DELETE" });
-  return response;
-}
-
-const confirmPurchaseOrderRequest = async (id: string) => {
-  const response = await apiFetch(`purchase-orders/${id}/confirm/`, { method: "PATCH" });
-  return response;
-}
-
-const receivePurchaseOrderRequest = async (id: string) => {
-  const response = await apiFetch(`purchase-orders/${id}/receive/`, { method: "PATCH" });
-  return response;
-}
-
 const PurchaseOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useGetPurchaseOrder(id!);
 
-  const deletePurchaseOrderMutation = useMutation({
-    mutationFn: deletePurchaseOrderRequest,
-  });
-
-  const confirmPurchaseOrderMutation = useMutation({
-    mutationFn: confirmPurchaseOrderRequest,
-  });
-
-  const receivePurchaseOrderMutation = useMutation({
-    mutationFn: receivePurchaseOrderRequest,
-  });
+  const deletePurchaseOrderMutation = useDeletePurchaseOrder(id!);
+  const confirmPurchaseOrderMutation = useConfirmPurchaseOrder(id!);
+  const receivePurchaseOrderMutation = useReceivePurchaseOrder(id!);
 
   const confirmPurchaseOrder = async () => {
-    await confirmPurchaseOrderMutation.mutateAsync(id!);
+    await confirmPurchaseOrderMutation.mutateAsync();
     refetch();
   }
 
   const receivePurchaseOrder = async () => {
-    await receivePurchaseOrderMutation.mutateAsync(id!);
+    await receivePurchaseOrderMutation.mutateAsync();
     refetch();
   }
 
@@ -80,7 +55,7 @@ const PurchaseOrderDetails = () => {
       {
         label: "Delete",
         onClick: async () => {
-          await deletePurchaseOrderMutation.mutateAsync(id!);
+          await deletePurchaseOrderMutation.mutateAsync();
           navigate("/purchase-orders");
         },
         icon: <IconTrash size={16} />,

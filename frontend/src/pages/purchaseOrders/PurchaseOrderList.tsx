@@ -1,25 +1,19 @@
 import DataTable, { DataColumn } from "@/components/DataTable";
 import { PurchaseOrder } from "@/types/models/purchaseOrder";
-import { apiFetch } from "@/utils/api";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { Button, Group, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "@/components/Loading";
+import { useListPurchaseOrders } from "@/utils/apiHooks/purchaseOrders";
 
-const purchaseOrdersRequest = async () => {
-  const res = await apiFetch<PurchaseOrder[]>("purchase-orders/", { method: "GET" });
-  return res;
-}
+
 
 const PurchaseOrderList = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
-    queryKey: ["purchase-orders"],
-    queryFn: purchaseOrdersRequest,
-  });
+
+  const { data, isLoading } = useListPurchaseOrders();
 
   if (isLoading) {
     return <Loading />;

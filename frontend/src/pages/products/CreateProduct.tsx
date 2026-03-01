@@ -1,27 +1,17 @@
-import { Product } from "@/types/models/product";
-import { apiFetch } from "@/utils/api";
 import { Container, Stack, Title } from "@mantine/core";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import ProductForm, { ProductFormValues } from "./components/ProductForm";
+import { useCreateProduct } from "@/utils/apiHooks/products";
 
-const createProductRequest = async (data: ProductFormValues) => {
-  const response = await apiFetch<Product>("products/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  return response;
-}
+
 
 const CreateProduct = () => {
   const navigate = useNavigate();
 
-  const mutation = useMutation({
-    mutationFn: createProductRequest,
-  });
+  const createProductMutation = useCreateProduct();
 
   const handleSubmit = async (values: ProductFormValues) => {
-    const { id } = await mutation.mutateAsync(values);
+    const { id } = await createProductMutation.mutateAsync(values);
     navigate(`/products/${id}`);
   };
 
@@ -31,7 +21,7 @@ const CreateProduct = () => {
         <Title order={1}>Create Product</Title>
         <ProductForm
           onSubmit={handleSubmit}
-          isLoading={mutation.isPending}
+          isLoading={createProductMutation.isPending}
         />
       </Stack>
     </Container>

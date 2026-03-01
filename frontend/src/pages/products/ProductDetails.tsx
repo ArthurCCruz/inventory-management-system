@@ -1,12 +1,10 @@
-import { apiFetch } from "@/utils/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "@/utils/date";
 import DetailsView from "@/components/DetailsView";
 import DetailsField from "@/components/DetailsField";
 import { Divider, SimpleGrid, Stack, Title } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { useGetProduct, useGetProductFinancialData } from "../../utils/apiHooks/products";
+import { useDeleteProduct, useGetProduct, useGetProductFinancialData, useGetProductStockMoves } from "../../utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import ExpandableTable from "@/components/ExpandableTable";
@@ -15,31 +13,15 @@ import { useGetProductQuantity } from "@/utils/apiHooks/stock";
 import { formatCurrency } from "@/utils/currency";
 import Loading from "@/components/Loading";
 
-const deleteProductRequest = async (id: string) => {
-  const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
-  return response;
-}
-
-const getProductStockMovesRequest = async (id: string) => {
-  const response = await apiFetch<StockMove[]>(`products/${id}/moves/`, { method: "GET" });
-  return response;
-}
-
-
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { data, isLoading } = useGetProduct(id!);
 
-  const deleteProductMutation = useMutation({
-    mutationFn: deleteProductRequest,
-  });
+  const deleteProductMutation = useDeleteProduct(id!);
 
-  const { data: stockMoves, isLoading: isLoadingStockMoves } = useQuery({
-    queryKey: ["product-stock-moves", id],
-    queryFn: () => getProductStockMovesRequest(id!),
-  });
+  const { data: stockMoves, isLoading: isLoadingStockMoves } = useGetProductStockMoves(id!);
 
   const { data: stockQuantity, isLoading: isLoadingStockQuantity } = useGetProductQuantity(id!);
 
@@ -62,7 +44,7 @@ const ProductDetails = () => {
     {
       label: "Delete",
       onClick: async () => {
-        await deleteProductMutation.mutateAsync(id!);
+        await deleteProductMutation.mutateAsync();
         navigate("/products");
       },
       icon: <IconTrash size={16} />,
