@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/types/models/user";
 import { setAccessToken } from "@/utils/api";
 import { fetchMeKey, LoginData, useFetchMe, useLogin, useLogout } from "@/utils/apiHooks/auth";
+import { useErrorHandler } from "@/utils/errorHandler";
 
 type AuthContextValue = {
   user: User | null;
@@ -23,11 +24,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Query: current user (me)
   const meQuery = useFetchMe();
 
+  const { handleError } = useErrorHandler();
+
   // Mutation: login
   const loginMutation = useLogin({
     onSuccess: (data) => {
       setAccessToken(data.access);
       qc.setQueryData([fetchMeKey], data.user);
+    },
+    onError: (error) => {
+      handleError(error);
     },
   });
 

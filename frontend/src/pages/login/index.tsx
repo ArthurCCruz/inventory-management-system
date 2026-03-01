@@ -1,6 +1,7 @@
 import { Button, Card, Container, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 const Login = () => {
 
@@ -19,8 +20,15 @@ const Login = () => {
     validateInputOnChange: true,
   });
 
-  const handleSubmit = (values: typeof form.values) => {
-    login(values);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (values: typeof form.values) => {
+    setIsLoading(true);
+    try {
+      await login(values);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,7 +55,7 @@ const Login = () => {
                 type="password"
                 {...form.getInputProps("password")}
               />
-              <Button type="submit">Send</Button>
+              <Button type="submit" loading={isLoading}>Send</Button>
             </Stack>
           </form>
         </Card>
