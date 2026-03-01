@@ -6,7 +6,9 @@ import App from './App'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import '@mantine/core/styles.css'
+import '@mantine/notifications/styles.css'
 import { AuthProvider } from './contexts/AuthContext'
+import { Notifications } from '@mantine/notifications'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
+        <Notifications position="top-right"/>
         <BrowserRouter>
           <AuthProvider>
             <App />

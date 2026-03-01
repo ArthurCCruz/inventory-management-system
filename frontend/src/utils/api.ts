@@ -4,6 +4,13 @@ const BASE_URL = `${API_URL}/v1`;
 
 let accessToken: string | null = null;
 
+export class DetailedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DetailedError";
+  }
+}
+
 export const getAccessToken = () => {
   return accessToken;
 }
@@ -44,8 +51,10 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
 
   let res = await doRequest();
 
+  const responseData = await res.json();
+
   // If access token expired, try refresh once and retry
-  if (res.status === 401 && shouldRefreshToken(await res.json())) {
+  if (res.status === 401 && shouldRefreshToken(responseData)) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       headers.set("Authorization", `Bearer ${newToken}`);
@@ -54,11 +63,14 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
   }
 
   if (!res.ok) {
-    throw new Error(await res.json());
+    if (responseData.detail) {
+      throw new DetailedError(responseData.detail);
+    }
+    throw new Error(JSON.stringify(responseData));
   }
 
   try {
-    return await res.json();
+    return responseData;
   } catch (error) {
     return null as unknown as T;
   }
