@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-if env('DATABASE_URL'):
+if env('DATABASE_URL', default=None):
     DATABASES = {
         'default': dj_database_url.config(default=env('DATABASE_URL'), conn_max_age=600, ssl_require=True)
     }
