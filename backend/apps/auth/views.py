@@ -19,8 +19,8 @@ def _set_refresh_cookie(response: Response, refresh: str):
         key=REFRESH_COOKIE_NAME,
         value=refresh,
         httponly=True,
-        secure=False,        # True in production with HTTPS
-        samesite="Lax",      # "None" (with secure=True) if truly cross-site
+        secure=True,        # True in production with HTTPS
+        samesite="None",      # "None" (with secure=True) if truly cross-site
         path="/v1/auth/",   # cookie only sent to auth endpoints
         max_age=14 * 24 * 60 * 60,
     )
