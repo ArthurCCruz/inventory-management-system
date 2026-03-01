@@ -26,7 +26,7 @@ def _set_refresh_cookie(response: Response, refresh: str):
     )
 
 def _clear_refresh_cookie(response: Response):
-    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/v1/auth/")
+    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/v1/auth/", samesite="None")
 
 class LoginData(TypedDict):
     username: str
