@@ -11,6 +11,20 @@ export class DetailedError extends Error {
   }
 }
 
+export class FormValidationError extends Error {
+  messages: {[key: string]: string[]};
+
+  constructor(messages: {[key: string]: string[]}) {
+    super(JSON.stringify(messages));
+    this.name = "FormValidationError";
+    this.messages = messages;
+  }
+}
+
+export const isFormValidationError = (error: any) => {
+  return Object.keys(error).length > 0 && Object.values(error).every(Array.isArray);
+}
+
 export const getAccessToken = () => {
   return accessToken;
 }
@@ -63,6 +77,9 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
   }
 
   if (!res.ok) {
+    if (res.status === 400 && isFormValidationError(responseData)) {
+      throw new FormValidationError(responseData);
+    }
     if (responseData.detail) {
       throw new DetailedError(responseData.detail);
     }

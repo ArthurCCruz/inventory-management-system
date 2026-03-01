@@ -77,7 +77,18 @@ export type SignupData = {
 }
 
 const signupRequest = async (data: SignupData): Promise<User> => {
-  const res = await apiFetch<User>("users/", { method: "POST", body: JSON.stringify(data) });
+  const res = await apiFetch<User>(
+    "users/", 
+    { 
+      method: "POST", 
+      body: JSON.stringify({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        username: data.username,
+        password: data.password,
+      }),
+    }
+  );
   return res;
 }
 

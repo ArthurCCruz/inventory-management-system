@@ -1,8 +1,14 @@
 import { Container, Title, Stack, Card, TextInput, Button } from "@mantine/core"
 import { useForm } from "@mantine/form";
 import { SignupData, useSignup } from "@/utils/apiHooks/auth";
+import { useState } from "react";
+import { FormValidationError } from "@/utils/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Signup = () => {
+
+  const { login } = useAuth();
+
   const form = useForm({
     initialValues: {
       username: "",
@@ -42,8 +48,20 @@ const Signup = () => {
 
   const signupMutation = useSignup();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = async (values: SignupData) => {
-    await signupMutation.mutateAsync(values);
+    setIsLoading(true);
+    try {
+      await signupMutation.mutateAsync(values);
+      await login(values);
+    } catch (error) {
+      if (error instanceof FormValidationError) {
+        form.setErrors(error.messages);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -80,9 +98,10 @@ const Signup = () => {
                 label="Password"
                 placeholder="Password"
                 required
+                type="password"
                 {...form.getInputProps("password")}
               />
-              <Button type="submit">Send</Button>
+              <Button type="submit" loading={isLoading}>Send</Button>
             </Stack>
           </form>
         </Card>
