@@ -1,4 +1,4 @@
-import { StockMove, StockQuantity } from "./stock";
+import { StockQuantityTotals } from "./stock";
 import { PublicUser } from "./user";
 
 export type ProductRecord = {
@@ -13,9 +13,5 @@ export type Product = ProductRecord & {
   created_at: string;
   updated_at: string;
   created_by: PublicUser;
-  stock_quantity: StockQuantity;
-};
-
-export type ProductStockMoves = {
-  stock_moves: StockMove[];
+  stock_quantity_totals: StockQuantityTotals;
 };

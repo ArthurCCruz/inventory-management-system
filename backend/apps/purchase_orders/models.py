@@ -90,7 +90,7 @@ class PurchaseOrder(OwnedModel):
 
         for line in self.lines.all():
             for move in line.stock_move.all():
-                move.set_done()
+                move.set_done_generating_lots()
         
         self.status = self.Status.RECEIVED
         self.save(update_fields=["status"])

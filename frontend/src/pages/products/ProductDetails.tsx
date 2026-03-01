@@ -9,8 +9,9 @@ import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useGetProduct } from "../../utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
 import DataTable, { DataColumn } from "@/components/DataTable";
-import { StockMove } from "@/types/models/stock";
-import { ProductStockMoves } from "@/types/models/product";
+import ExpandableTable from "@/components/ExpandableTable";
+import { StockMove, StockMoveLine, StockQuantity } from "@/types/models/stock";
+import { useGetProductQuantity } from "@/utils/apiHooks/stock";
 
 const deleteProductRequest = async (id: string) => {
   const response = await apiFetch(`products/${id}/`, { method: "DELETE" });
@@ -18,9 +19,10 @@ const deleteProductRequest = async (id: string) => {
 }
 
 const getProductStockMovesRequest = async (id: string) => {
-  const response = await apiFetch<ProductStockMoves>(`products/${id}/moves/`, { method: "GET" });
+  const response = await apiFetch<StockMove[]>(`products/${id}/moves/`, { method: "GET" });
   return response;
 }
+
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -32,12 +34,14 @@ const ProductDetails = () => {
     mutationFn: deleteProductRequest,
   });
 
-  const { data: stockMoves } = useQuery({
+  const { data: stockMoves, isLoading: isLoadingStockMoves } = useQuery({
     queryKey: ["product-stock-moves", id],
     queryFn: () => getProductStockMovesRequest(id!),
   });
 
-  if (isLoading) {
+  const { data: stockQuantity, isLoading: isLoadingStockQuantity } = useGetProductQuantity(id!);
+
+  if (isLoading || isLoadingStockMoves || isLoadingStockQuantity) {
     return <div>Loading...</div>;
   }
 
@@ -73,6 +77,20 @@ const ProductDetails = () => {
     { label: "Updated At", render: ({ updated_at }) => formatDate(updated_at) },
   ];
 
+  const stockMoveLineColumns: DataColumn<StockMoveLine>[] = [
+    { label: "Lot", render: ({ stock_lot }) => stock_lot.name },
+    { label: "Quantity", render: ({ quantity }) => quantity },
+    { label: "Unit", render: () => data.unit },
+  ];
+
+  const stockQuantityColumns: DataColumn<StockQuantity>[] = [
+    { label: "Lot", render: ({ stock_lot }) => stock_lot.name },
+    { label: "Quantity", render: ({ quantity }) => quantity },
+    { label: "Reserved Quantity", render: ({ reserved_quantity }) => reserved_quantity },
+    { label: "Available Quantity", render: ({ available_quantity }) => available_quantity },
+    { label: "Unit", render: () => data.unit },
+  ];
+
   const updateQuantityAction = {
     label: "Update",
     onClick: () => navigate(`/products/${id}/update-quantity`),
@@ -98,17 +116,25 @@ const ProductDetails = () => {
       <Title order={3}>Stock</Title>
       <SimpleGrid cols={2} spacing="lg">
         <Stack gap="lg">
-          <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity.quantity)} action={updateQuantityAction} />
-          <DetailsField label="Reserved Quantity" value={formatNumber(data.stock_quantity.reserved_quantity)} />
+          <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity_totals.quantity)} action={updateQuantityAction} />
+          <DetailsField label="Reserved Quantity" value={formatNumber(data.stock_quantity_totals.reserved_quantity)} />
         </Stack>
         <Stack gap="lg">
-          <DetailsField label="Available Quantity" value={formatNumber(data.stock_quantity.available_quantity)} />
-          <DetailsField label="Forecasted Quantity" value={formatNumber(data.stock_quantity.forecasted_quantity)} />
+          <DetailsField label="Available Quantity" value={formatNumber(data.stock_quantity_totals.available_quantity)} />
+          <DetailsField label="Forecasted Quantity" value={formatNumber(data.stock_quantity_totals.forecasted_quantity)} />
         </Stack>
       </SimpleGrid>
+      <DataTable data={stockQuantity || []} columns={stockQuantityColumns} emptyText="No stock quantity found." />
       <Divider my="lg" />
       <Title order={3}>Stock Moves</Title>
-      <DataTable data={stockMoves?.stock_moves || []} columns={stockMoveColumns} emptyText="No stock moves found." />
+      <ExpandableTable 
+        data={stockMoves || []} 
+        columns={stockMoveColumns} 
+        childColumns={stockMoveLineColumns}
+        getChildData={(move) => move.stock_move_lines}
+        emptyText="No stock moves found."
+        emptyChildText="No move lines found."
+      />
     </DetailsView>
   );
 };

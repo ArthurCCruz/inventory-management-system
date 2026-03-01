@@ -1,17 +1,18 @@
-import { useGetProduct } from "@/utils/apiHooks/products";
 import { Container, Stack, Title } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import UpdateQuantityForm from "./components/UpdateQuantityForm";
+import { useGetProductLots, useGetProductQuantity } from "@/utils/apiHooks/stock";
 
 const UpdateProductQuantity = () => {
   const { id } = useParams();
-  const { data, isLoading } = useGetProduct(id!);
+  const { data, isLoading } = useGetProductQuantity(id!);
+  const { data: lotList, isLoading: isLoadingLotList } = useGetProductLots(id!);
 
-  if (isLoading) {
+  if (isLoading || isLoadingLotList) {
     return <div>Loading...</div>;
   }
 
-  if (!data) {
+  if (!data || !lotList) {
     return <div>Product not found</div>;
   }
 
@@ -19,7 +20,7 @@ const UpdateProductQuantity = () => {
     <Container size="md">
       <Stack>
         <Title order={1}>Update Product Quantity</Title>
-        <UpdateQuantityForm product={data} />
+        <UpdateQuantityForm quantityList={data} lotList={lotList} productId={id!} />
       </Stack>
     </Container>
   );

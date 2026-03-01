@@ -81,8 +81,22 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
 
+# @name GetProductStockQuantity
+GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/stock-quantity/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
 # @name GetProductMoves
 GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/moves/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
+# @name GetProductLots
+GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/lots/
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
 
