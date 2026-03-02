@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
+from config import settings
+
 from .serializers import LoginSerializer
 from typing import TypedDict, cast
 
@@ -19,14 +21,14 @@ def _set_refresh_cookie(response: Response, refresh: str):
         key=REFRESH_COOKIE_NAME,
         value=refresh,
         httponly=True,
-        secure=True,        # True in production with HTTPS
-        samesite="None",      # "None" (with secure=True) if truly cross-site
+        secure=settings.SESSION_COOKIE_SECURE,        # True in production with HTTPS
+        samesite=settings.SESSION_COOKIE_SAMESITE,      # "None" (with secure=True) if truly cross-site
         path="/v1/auth/",   # cookie only sent to auth endpoints
         max_age=14 * 24 * 60 * 60,
     )
 
 def _clear_refresh_cookie(response: Response):
-    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/v1/auth/", samesite="None")
+    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/v1/auth/", samesite=settings.SESSION_COOKIE_SAMESITE)
 
 class LoginData(TypedDict):
     username: str

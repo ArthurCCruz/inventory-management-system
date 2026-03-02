@@ -102,6 +102,13 @@ Authorization: Bearer {{Refresh.response.body.$.access}}
 
 ###
 
+# @name GetProductFinancialData
+GET {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/financial-data/
+Content-Type: {{contentType}}
+Authorization: Bearer {{Refresh.response.body.$.access}}
+
+###
+
 # @name UpdateProduct
 PATCH {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/
 Content-Type: {{contentType}}
@@ -125,9 +132,18 @@ PATCH {{baseUrl}}/{{apiVersion}}/products/{{CreateProduct.response.body.$.id}}/u
 Content-Type: {{contentType}}
 Authorization: Bearer {{Refresh.response.body.$.access}}
 
-{
-    "quantity": 200
-}
+[
+    {
+        "stock_lot_id": 25,
+        "quantity": 400,
+        "create_new_lot": false
+    },
+    {
+        "create_new_lot": true,
+        "quantity": 200,
+        "unit_price": 100
+    }
+]
 
 ###
 

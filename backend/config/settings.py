@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from typing import Literal, cast
 import environ
 from datetime import timedelta
 import dj_database_url
@@ -165,10 +166,12 @@ CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
 
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SameSiteType = Literal['Lax', 'Strict', 'None', False]
+
+SESSION_COOKIE_SAMESITE = cast(SameSiteType, env.str('COOKIE_SAMESITE', default='Lax'))
+CSRF_COOKIE_SAMESITE = cast(SameSiteType, env.str('COOKIE_SAMESITE', default='Lax'))
+SESSION_COOKIE_SECURE = env.bool('COOKIE_SECURE', default=True)
+CSRF_COOKIE_SECURE = env.bool('COOKIE_SECURE', default=True)
 
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'http://localhost:5173',
