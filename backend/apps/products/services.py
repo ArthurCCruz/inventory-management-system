@@ -1,9 +1,10 @@
 from decimal import Decimal
 from typing import TypedDict
 
-from django.core.exceptions import ValidationError
 from apps.products.models import Product
 from apps.stock.models import StockLot, StockMove, StockMoveLine, StockQuantity
+from django.db.models import F, DecimalField, Sum, Value
+from django.db.models.functions import Coalesce
 
 
 class UpdateProductQuantityData(TypedDict):
@@ -88,56 +89,84 @@ def perform_stock_moves(product: Product, quantities: list[tuple[Decimal, StockL
     return stock_move
 
 def calculate_financial_data(product: Product):
-    stock_value = sum(
-        stock_quantity.stock_lot.unit_price * stock_quantity.quantity
-        for stock_quantity in product.stock_quantity.all()
+    stock_metrics = product.stock_quantity.aggregate(
+        stock_value=Coalesce(
+            Sum(F('quantity') * F('stock_lot__unit_price')),
+            Value(0),
+            output_field=DecimalField()
+        ),
+        stock_units=Coalesce(
+            Sum('quantity'),
+            Value(0),
+            output_field=DecimalField()
+        )
     )
-    stock_units = sum(stock_quantity.quantity for stock_quantity in product.stock_quantity.all())
-    stock_unit_price = stock_value / stock_units if stock_units else Decimal(0)
+    stock_value = stock_metrics['stock_value']
+    stock_units = stock_metrics['stock_units']
+    stock_unit_price = Decimal(stock_value / stock_units).quantize(Decimal("0.01")) if stock_units else Decimal(0)
     
-    purchased_units = sum(
-        stock_move.quantity
-        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.SUPPLIER, status=StockMove.Status.DONE)
+    purchase_metrics = product.stock_moves.filter(
+        from_location=StockMove.Location.SUPPLIER,
+        status=StockMove.Status.DONE
+    ).aggregate(
+        purchased_units=Coalesce(Sum(F('stock_move_lines__quantity')), Value(0), output_field=DecimalField()),
+        purchased_value=Coalesce(
+            Sum(F('stock_move_lines__quantity') * F('stock_move_lines__stock_lot__unit_price')),
+            Value(0),
+            output_field=DecimalField()
+        )
     )
-    purchased_value = sum(
-        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
-        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.SUPPLIER, status=StockMove.Status.DONE)
-        for stock_move_line in stock_move.stock_move_lines.all()
-    )
+    purchased_units = purchase_metrics['purchased_units']
+    purchased_value = purchase_metrics['purchased_value']
 
-    sold_units = sum(
-        stock_move.quantity
-        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
-    )
-    sold_value = sum(
-        stock_move.sale_order_line.unit_price * stock_move.quantity
-        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
+    sales_metrics = product.stock_moves.filter(
+        to_location=StockMove.Location.CUSTOMER,
+        status=StockMove.Status.DONE
+    ).aggregate(
+        sold_units=Coalesce(Sum(F('stock_move_lines__quantity')), Value(0), output_field=DecimalField()),
+        sold_value=Coalesce(
+            Sum(F('sale_order_line__unit_price') * F('stock_move_lines__quantity')),
+            Value(0),
+            output_field=DecimalField()
+        ),
+        cogs=Coalesce(
+            Sum(F('stock_move_lines__quantity') * F('stock_move_lines__stock_lot__unit_price')),
+            Value(0),
+            output_field=DecimalField()
+        )
     )
     
-    cogs = sum(
-        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
-        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.CUSTOMER, status=StockMove.Status.DONE)
-        for stock_move_line in stock_move.stock_move_lines.all()
-    )
+    sold_units = sales_metrics['sold_units']
+    sold_value = sales_metrics['sold_value']
+    cogs = sales_metrics['cogs']
 
     gross_profit = sold_value - cogs
-    margin = (gross_profit / cogs) * 100 if cogs else Decimal(0)
+    margin = Decimal((gross_profit / cogs) * 100).quantize(Decimal("0.01")) if cogs else Decimal(0)
 
-    write_off_units = sum(
-        stock_move.quantity
-        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
+    write_off_metrics = product.stock_moves.filter(
+        to_location=StockMove.Location.ADJUSTMENT,
+        status=StockMove.Status.DONE
+    ).aggregate(
+        write_off_units=Coalesce(Sum(F('stock_move_lines__quantity')), Value(0), output_field=DecimalField()),
+        write_off_value=Coalesce(
+            Sum(F('stock_move_lines__quantity') * F('stock_move_lines__stock_lot__unit_price')),
+            Value(0),
+            output_field=DecimalField()
+        )
     )
-    write_off_value = sum(
-        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
-        for stock_move in product.stock_moves.filter(to_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
-        for stock_move_line in stock_move.stock_move_lines.all()
-    )
+    write_off_units = write_off_metrics['write_off_units']
+    write_off_value = write_off_metrics['write_off_value']
 
-    adjustment_in_value = sum(
-        stock_move_line.quantity * stock_move_line.stock_lot.unit_price
-        for stock_move in product.stock_moves.filter(from_location=StockMove.Location.ADJUSTMENT, status=StockMove.Status.DONE)
-        for stock_move_line in stock_move.stock_move_lines.all()
-    )
+    adjustment_in_value = product.stock_moves.filter(
+        from_location=StockMove.Location.ADJUSTMENT,
+        status=StockMove.Status.DONE
+    ).aggregate(
+        adjustment_in_value=Coalesce(
+            Sum(F('stock_move_lines__quantity') * F('stock_move_lines__stock_lot__unit_price')),
+            Value(0),
+            output_field=DecimalField()
+        )
+    )['adjustment_in_value']
 
     return {
         "stock_value": stock_value,
