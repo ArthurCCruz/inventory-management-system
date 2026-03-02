@@ -48,5 +48,6 @@ ENV PORT=8000
 
 CMD python manage.py migrate && \
     python manage.py create_superuser_if_not_exists && \
+    python manage.py create_demo_data && \
     python manage.py collectstatic --noinput && \
     gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120

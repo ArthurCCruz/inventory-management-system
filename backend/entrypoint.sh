@@ -17,6 +17,10 @@ python manage.py migrate --noinput
 echo "Creating superuser if not exists..."
 python manage.py create_superuser_if_not_exists
 
+# Create demo data
+echo "Creating demo data..."
+python manage.py create_demo_data
+
 # Collect static files in production
 if [ "$DEBUG" = "False" ]; then
   echo "Collecting static files..."

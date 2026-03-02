@@ -35,7 +35,7 @@ class StockQuantity(OwnedModel):
 
     @staticmethod
     def get_fifo(product: Product):
-        return product.stock_quantity.order_by("stock_lot__created_at")
+        return product.stock_quantity.all().order_by("stock_lot__created_at")
 
     def update_quantity(self, quantity: Decimal):
         self.quantity += quantity.quantize(Decimal("0.01"))
