@@ -1,6 +1,7 @@
+
 from rest_framework import serializers
 
-from apps.products.services import calculate_financial_data
+from apps.products.services import calculate_financial_data, calculate_stock_quantity_totals
 from apps.stock.serializers import StockLotSerializer, StockMoveSerializer, StockQuantitySerializer
 from apps.stock.models import StockMove
 from .models import Product
@@ -17,20 +18,7 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_stock_quantity_totals(self, obj):
-        available_quantity = sum(stock_quantity.available_quantity for stock_quantity in obj.stock_quantity.all())
-        forecasted_quantity = available_quantity
-        for move in obj.stock_moves.filter(status=StockMove.Status.PENDING):
-            if move.to_location == StockMove.Location.STOCK:
-                forecasted_quantity += move.quantity
-            else:
-                forecasted_quantity -= move.quantity
-
-        return {
-            "quantity": sum(stock_quantity.quantity for stock_quantity in obj.stock_quantity.all()),
-            "reserved_quantity": sum(stock_quantity.reserved_quantity for stock_quantity in obj.stock_quantity.all()),
-            "available_quantity": available_quantity,
-            "forecasted_quantity": forecasted_quantity,
-        }
+        return calculate_stock_quantity_totals(obj)
 
 class ProductLotSerializer(serializers.ModelSerializer):
     stock_lots = StockLotSerializer(many=True, read_only=True)

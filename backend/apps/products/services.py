@@ -3,7 +3,7 @@ from typing import TypedDict
 
 from apps.products.models import Product
 from apps.stock.models import StockLot, StockMove, StockMoveLine, StockQuantity
-from django.db.models import F, DecimalField, Sum, Value
+from django.db.models import F, DecimalField, Sum, Value, Q
 from django.db.models.functions import Coalesce
 
 
@@ -50,7 +50,7 @@ def update_product_quantity(product: Product, data: list[UpdateProductQuantityDa
         if item["unit_price"] is None:
           errors[f"lines.{index}.unit_price"] = ["Unit price is required for new lots."]
           continue
-        if item["unit_price"] < 0:
+        if Decimal(str(item["unit_price"])) < 0:
           errors[f"lines.{index}.unit_price"] = ["Unit price must be 0 or greater for new lots."]
           continue
 
@@ -182,4 +182,35 @@ def calculate_financial_data(product: Product):
         "write_off_units": write_off_units,
         "write_off_value": write_off_value,
         "adjustment_in_value": adjustment_in_value,
+    }
+
+def calculate_stock_quantity_totals(product: Product):
+    stock_totals = product.stock_quantity.aggregate(
+        total_quantity=Coalesce(Sum("quantity", output_field=DecimalField()), Decimal('0')),
+        total_reserved=Coalesce(Sum("reserved_quantity", output_field=DecimalField()), Decimal('0')),
+    )
+    
+    quantity = stock_totals["total_quantity"]
+    reserved_quantity = stock_totals["total_reserved"]
+    available_quantity = quantity - reserved_quantity
+    
+    # Aggregate pending stock moves in a single query using conditional aggregation
+    pending_moves = product.stock_moves.filter(status=StockMove.Status.PENDING).aggregate(
+        incoming=Coalesce(
+            Sum("quantity", filter=Q(to_location=StockMove.Location.STOCK), output_field=DecimalField()),
+            Decimal('0')
+        ),
+        outgoing=Coalesce(
+            Sum("quantity", filter=Q(from_location=StockMove.Location.STOCK), output_field=DecimalField()),
+            Decimal('0')
+        ),
+    )
+    
+    forecasted_quantity = available_quantity + pending_moves["incoming"] - pending_moves["outgoing"]
+
+    return {
+        "quantity": quantity,
+        "reserved_quantity": reserved_quantity,
+        "available_quantity": available_quantity,
+        "forecasted_quantity": forecasted_quantity,
     }

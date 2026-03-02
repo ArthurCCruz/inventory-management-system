@@ -20,3 +20,4 @@ tomli==2.4.0
 types-PyYAML==6.0.12.20250915
 typing_extensions==4.15.0
 whitenoise==6.8.2
+factory-boy==3.3.0
