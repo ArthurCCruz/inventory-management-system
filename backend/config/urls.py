@@ -24,4 +24,5 @@ urlpatterns = [
     path('v1/', include('apps.products.urls')),
     path('v1/', include('apps.purchase_orders.urls')),
     path('v1/', include('apps.sale_orders.urls')),
+    path('v1/', include('apps.dashboard.urls')),
 ]

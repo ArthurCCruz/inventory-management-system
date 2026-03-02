@@ -9,6 +9,10 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
 
   const menus = [
     {
+      label: "Dashboard",
+      href: "/",
+    },
+    {
       label: "Products",
       href: "/products",
     },
