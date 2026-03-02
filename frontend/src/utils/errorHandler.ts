@@ -9,6 +9,13 @@ export const useErrorHandler = () => {
         message: error.message,
         color: "red",
       });
+    } else {
+      console.error(error);
+      notifications.show({
+        title: "Error",
+        message: "An unknown error occurred",
+        color: "red",
+      });
     }
   };
   

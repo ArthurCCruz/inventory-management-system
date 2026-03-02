@@ -1,3 +1,4 @@
+import useFormSubmitHandler from "@/utils/formSubmitHandler";
 import { Stack, TextInput, Select, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
@@ -10,12 +11,11 @@ export interface ProductFormValues {
 }
 
 interface ProductFormProps {
-  onSubmit: (values: ProductFormValues) => void;
+  onSubmit: (values: ProductFormValues) => Promise<void>;
   initialValues?: ProductFormValues;
-  isLoading: boolean;
 }
 
-const ProductForm: FC<ProductFormProps> = ({ onSubmit, initialValues = { name: "", sku: "", description: "", unit: "" }, isLoading }) => {
+const ProductForm: FC<ProductFormProps> = ({ onSubmit, initialValues = { name: "", sku: "", description: "", unit: "" } }) => {
   const form = useForm({
     initialValues,
     validate: {
@@ -28,8 +28,10 @@ const ProductForm: FC<ProductFormProps> = ({ onSubmit, initialValues = { name: "
     validateInputOnChange: true,
   });
 
+  const { handleSubmit, isLoading } = useFormSubmitHandler(form, onSubmit);
+
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <Stack>
         <TextInput label="Name" placeholder="Name" required {...form.getInputProps("name")} />
         <TextInput label="SKU" placeholder="SKU" required {...form.getInputProps("sku")} />

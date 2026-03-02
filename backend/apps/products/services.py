@@ -13,25 +13,28 @@ class UpdateProductQuantityData(TypedDict):
     unit_price: Decimal | None
 
 def update_product_quantity(product: Product, data: list[UpdateProductQuantityData]):
-    new_lot_quantity: list[UpdateProductQuantityData] = []
-    existing_lot_quantity: list[UpdateProductQuantityData] = []
-    for item in data:
+    new_lot_quantity: list[tuple[int,UpdateProductQuantityData]] = []
+    existing_lot_quantity: list[tuple[int,UpdateProductQuantityData]] = []
+    for index, item in enumerate(data):
         if item["create_new_lot"]:
-            new_lot_quantity.append(item)
+            new_lot_quantity.append((index, item))
         else:
-            existing_lot_quantity.append(item)
+            existing_lot_quantity.append((index, item))
     
     decreasing_quantity: list[tuple[Decimal, StockLot]] = []
     increasing_quantity: list[tuple[Decimal, StockLot]] = []
 
-    for item in existing_lot_quantity:
+    errors = {}
+
+    for index, item in existing_lot_quantity:
         try:
           stock_quantity = product.stock_quantity.get(stock_lot=item["stock_lot_id"])
           new_quantity = Decimal(item["quantity"])
           if new_quantity == stock_quantity.quantity:
               continue
           if new_quantity < stock_quantity.reserved_quantity:
-              raise ValidationError("Quantity cannot be less than reserved quantity.")
+              errors[f"lines.{index}.quantity"] = ["Quantity cannot be less than reserved quantity."]
+              continue
           quantity_to_adjust = new_quantity - stock_quantity.quantity
           if new_quantity > stock_quantity.quantity:
               increasing_quantity.append((quantity_to_adjust, stock_quantity.stock_lot))
@@ -42,11 +45,18 @@ def update_product_quantity(product: Product, data: list[UpdateProductQuantityDa
             lot = StockLot.objects.get(id=item["stock_lot_id"])
             increasing_quantity.append((new_quantity, lot))
 
-    for item in new_lot_quantity:
+    for index, item in new_lot_quantity:
         if item["unit_price"] is None:
-          raise ValidationError("Unit price is required for new lots.")
+          errors[f"lines.{index}.unit_price"] = ["Unit price is required for new lots."]
+          continue
         if item["unit_price"] < 0:
-          raise ValidationError("Unit price must be 0 or greater for new lots.")
+          errors[f"lines.{index}.unit_price"] = ["Unit price must be 0 or greater for new lots."]
+          continue
+
+    if errors:
+        return errors
+
+    for index, item in new_lot_quantity:
         new_quantity = Decimal(item["quantity"])
         lot = StockLot.objects.create(product=product, created_by=product.created_by, unit_price=item["unit_price"])
         increasing_quantity.append((new_quantity, lot))  

@@ -1,6 +1,6 @@
 import { SaleOrder } from "@/types/models/saleOrder";
 import { apiFetch } from "@/utils/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery } from "@tanstack/react-query";
 
 const getSaleOrderRequest = async (id: string) => {
   const response = await apiFetch<SaleOrder>(`sale-orders/${id}/`, { method: "GET" });
@@ -62,9 +62,10 @@ const deleteSaleOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useDeleteSaleOrder = (id: string) => {
+export const useDeleteSaleOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => deleteSaleOrderRequest(id),
+    ...options,
   });
 }
 
@@ -73,9 +74,10 @@ const confirmSaleOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useConfirmSaleOrder = (id: string) => {
+export const useConfirmSaleOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => confirmSaleOrderRequest(id),
+    ...options,
   });
 }
 
@@ -84,9 +86,10 @@ const reserveSaleOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useReserveSaleOrder = (id: string) => {
+export const useReserveSaleOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => reserveSaleOrderRequest(id),
+    ...options,
   });
 }
 
@@ -95,8 +98,9 @@ const deliverSaleOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useDeliverSaleOrder = (id: string) => {
+export const useDeliverSaleOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => deliverSaleOrderRequest(id),
+    ...options,
   });
 }

@@ -33,7 +33,6 @@ const EditProduct = () => {
         <ProductForm
           onSubmit={handleSubmit}
           initialValues={data}
-          isLoading={editProductMutation.isPending}
         />
       </Stack>
     </Container>

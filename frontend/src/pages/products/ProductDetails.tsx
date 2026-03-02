@@ -12,14 +12,21 @@ import { StockMove, StockMoveLine, StockQuantity } from "@/types/models/stock";
 import { useGetProductQuantity } from "@/utils/apiHooks/stock";
 import { formatCurrency } from "@/utils/currency";
 import Loading from "@/components/Loading";
+import { useErrorHandler } from "@/utils/errorHandler";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { handleError } = useErrorHandler();
 
   const { data, isLoading } = useGetProduct(id!);
 
-  const deleteProductMutation = useDeleteProduct(id!);
+  const deleteProductMutation = useDeleteProduct(id!, {
+    onSuccess: () => {
+      navigate("/products");
+    },
+    onError: handleError,
+  });
 
   const { data: stockMoves, isLoading: isLoadingStockMoves } = useGetProductStockMoves(id!);
 
@@ -43,10 +50,7 @@ const ProductDetails = () => {
     },
     {
       label: "Delete",
-      onClick: async () => {
-        await deleteProductMutation.mutateAsync();
-        navigate("/products");
-      },
+      onClick: deleteProductMutation.mutateAsync,
       icon: <IconTrash size={16} />,
       color: "red",
     },

@@ -9,32 +9,39 @@ import DataTable, { DataColumn } from "@/components/DataTable";
 import { useConfirmSaleOrder, useDeleteSaleOrder, useDeliverSaleOrder, useGetSaleOrder, useReserveSaleOrder } from "@/utils/apiHooks/saleOrder";
 import { SaleOrderLine } from "@/types/models/saleOrder";
 import Loading from "@/components/Loading";
+import { useErrorHandler } from "@/utils/errorHandler";
 
 
 const SaleOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useGetSaleOrder(id!);
+  const { handleError } = useErrorHandler();
 
-  const deleteSaleOrderMutation = useDeleteSaleOrder(id!);
-  const confirmSaleOrderMutation = useConfirmSaleOrder(id!);
-  const reserveSaleOrderMutation = useReserveSaleOrder(id!);
-  const deliverSaleOrderMutation = useDeliverSaleOrder(id!);
-
-  const confirmSaleOrder = async () => {
-    await confirmSaleOrderMutation.mutateAsync();
-    refetch();
-  }
-
-  const reserveSaleOrder = async () => {
-    await reserveSaleOrderMutation.mutateAsync();
-    refetch();
-  }
-
-  const deliverSaleOrder = async () => {
-    await deliverSaleOrderMutation.mutateAsync();
-    refetch();
-  }
+  const deleteSaleOrderMutation = useDeleteSaleOrder(id!, {
+    onSuccess: () => {
+      navigate("/sale-orders");
+    },
+    onError: handleError,
+  });
+  const confirmSaleOrderMutation = useConfirmSaleOrder(id!, {
+    onSuccess: () => {
+      refetch();
+    },
+    onError: handleError,
+  });
+  const reserveSaleOrderMutation = useReserveSaleOrder(id!, {
+    onSuccess: () => {
+      refetch();
+    },
+    onError: handleError,
+  });
+  const deliverSaleOrderMutation = useDeliverSaleOrder(id!, {
+    onSuccess: () => {
+      refetch();
+    },
+    onError: handleError,
+  });
 
   if (isLoading) {
     return <Loading />;
@@ -55,15 +62,12 @@ const SaleOrderDetails = () => {
       },
       {
         label: "Confirm",
-        onClick: confirmSaleOrder,
+        onClick: confirmSaleOrderMutation.mutateAsync,
         icon: <IconCheck size={16} />,
       },
       {
         label: "Delete",
-        onClick: async () => {
-          await deleteSaleOrderMutation.mutateAsync();
-          navigate("/sale-orders");
-        },
+        onClick: deleteSaleOrderMutation.mutateAsync,
         icon: <IconTrash size={16} />,
         color: "red",
       }
@@ -74,7 +78,7 @@ const SaleOrderDetails = () => {
     actions.push(
       {
         label: "Reserve",
-        onClick: reserveSaleOrder,
+        onClick: reserveSaleOrderMutation.mutateAsync,
         icon: <IconCheck size={16} />,
       },
     )
@@ -84,7 +88,7 @@ const SaleOrderDetails = () => {
     actions.push(
       {
         label: "Deliver",
-        onClick: deliverSaleOrder,
+        onClick: deliverSaleOrderMutation.mutateAsync,
         icon: <IconCheck size={16} />,
       },
     )

@@ -39,8 +39,10 @@ class ProductViewSet(OwnedModelViewSet):
     @transaction.atomic
     def update_quantity(self, request, pk=None):
         product = cast(Product, self.get_object())
-        update_product_quantity(product, request.data)
-        return Response(status=status.HTTP_200_OK)
+        errors = update_product_quantity(product, request.data)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK, data={"message": "Quantity updated successfully"})
 
     @action(detail=True, methods=["get"], url_path="financial-data")
     def financial_data(self, request, pk=None):

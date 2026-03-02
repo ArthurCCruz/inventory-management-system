@@ -1,6 +1,6 @@
 import { PurchaseOrder } from "@/types/models/purchaseOrder";
 import { apiFetch } from "@/utils/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery } from "@tanstack/react-query";
 
 const getPurchaseOrderRequest = async (id: string) => {
   const response = await apiFetch<PurchaseOrder>(`purchase-orders/${id}/`, { method: "GET" });
@@ -63,9 +63,10 @@ const deletePurchaseOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useDeletePurchaseOrder = (id: string) => {
+export const useDeletePurchaseOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => deletePurchaseOrderRequest(id),
+    ...options,
   });
 }
 
@@ -74,9 +75,10 @@ const confirmPurchaseOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useConfirmPurchaseOrder = (id: string) => {
+export const useConfirmPurchaseOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => confirmPurchaseOrderRequest(id),
+    ...options,
   });
 }
 
@@ -85,8 +87,9 @@ const receivePurchaseOrderRequest = async (id: string) => {
   return response;
 }
 
-export const useReceivePurchaseOrder = (id: string) => {
+export const useReceivePurchaseOrder = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => receivePurchaseOrderRequest(id),
+    ...options,
   });
 }

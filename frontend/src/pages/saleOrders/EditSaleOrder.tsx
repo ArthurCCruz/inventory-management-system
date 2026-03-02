@@ -31,7 +31,7 @@ const EditSaleOrder = () => {
     <Container size="md">
       <Stack>
         <Title order={1}>Edit Sale Order</Title>
-        <SaleOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} isLoading={editSaleOrderMutation.isPending} />
+        <SaleOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
       </Stack>
     </Container>
   );

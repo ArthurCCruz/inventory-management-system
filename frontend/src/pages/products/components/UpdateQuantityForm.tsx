@@ -5,6 +5,7 @@ import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { UpdateProductQuantityData, useUpdateProductQuantity } from "@/utils/apiHooks/products";
+import useFormSubmitHandler from "@/utils/formSubmitHandler";
 
 interface UpdateQuantityFormProps {
   quantityList: StockQuantity[];
@@ -74,15 +75,16 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
     form.removeListItem("lines", index);
   };
 
-  const updateQuantityMutation = useUpdateProductQuantity(productId);
+  const updateQuantityMutation = useUpdateProductQuantity(productId, {
+    onSuccess: () => {
+      navigate(`/products/${productId}`);
+    },
+  });
 
-  const handleSubmit = async (values: { lines: UpdateProductQuantityData[] }) => {
-    await updateQuantityMutation.mutateAsync(values.lines);
-    navigate(`/products/${productId}`);
-  };
+  const { handleSubmit, isLoading } = useFormSubmitHandler(form, (values) => updateQuantityMutation.mutateAsync(values.lines));
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
+    <form onSubmit={handleSubmit}>
       <Stack>
         <Box>
           <Text size="sm" fw={500} mb="xs">
@@ -172,7 +174,7 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
             Add Line
           </Button>
         </Box>
-        <Button type="submit" mt="md">Submit</Button>
+        <Button type="submit" mt="md" loading={isLoading}>Submit</Button>
       </Stack>
     </form>
   );

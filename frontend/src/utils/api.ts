@@ -77,6 +77,7 @@ export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Pro
   }
 
   if (!res.ok) {
+    console.log(responseData);
     if (res.status === 400 && isFormValidationError(responseData)) {
       throw new FormValidationError(responseData);
     }

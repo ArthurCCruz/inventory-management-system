@@ -4,11 +4,11 @@ import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useListProducts } from "@/utils/apiHooks/products";
 import { UpsertPurchaseOrderData } from "@/utils/apiHooks/purchaseOrders";
+import useFormSubmitHandler from "@/utils/formSubmitHandler";
 
 interface PurchaseOrderFormProps {
-  onSubmit: (values: UpsertPurchaseOrderData) => void;
+  onSubmit: (values: UpsertPurchaseOrderData) => Promise<void>;
   initialValues?: UpsertPurchaseOrderData;
-  isLoading: boolean;
 }
 
 const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({ 
@@ -17,7 +17,6 @@ const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({
     supplier_name: "", 
     lines: [{ product: "", quantity: 1, unit_price: 0 }] 
   }, 
-  isLoading 
 }) => {
   const { data: products, isLoading: isLoadingProducts } = useListProducts();
 
@@ -48,8 +47,10 @@ const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({
     form.removeListItem("lines", index);
   };
 
+  const { handleSubmit, isLoading } = useFormSubmitHandler(form, onSubmit);
+
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <Stack>
         <TextInput 
           label="Supplier Name" 

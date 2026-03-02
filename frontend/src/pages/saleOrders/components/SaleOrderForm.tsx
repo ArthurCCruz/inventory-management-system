@@ -4,11 +4,11 @@ import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useListProducts } from "@/utils/apiHooks/products";
 import { UpsertSaleOrderData } from "@/utils/apiHooks/saleOrder";
+import useFormSubmitHandler from "@/utils/formSubmitHandler";
 
 interface SaleOrderFormProps {
-  onSubmit: (values: UpsertSaleOrderData) => void;
+  onSubmit: (values: UpsertSaleOrderData) => Promise<void>;
   initialValues?: UpsertSaleOrderData;
-  isLoading: boolean;
 }
 
 const SaleOrderForm: FC<SaleOrderFormProps> = ({ 
@@ -17,7 +17,6 @@ const SaleOrderForm: FC<SaleOrderFormProps> = ({
     customer_name: "", 
     lines: [{ product: "", quantity: 1, unit_price: 0 }] 
   }, 
-  isLoading 
 }) => {
   const { data: products, isLoading: isLoadingProducts } = useListProducts();
 
@@ -48,8 +47,10 @@ const SaleOrderForm: FC<SaleOrderFormProps> = ({
     form.removeListItem("lines", index);
   };
 
+  const { handleSubmit, isLoading } = useFormSubmitHandler(form, onSubmit);
+
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <Stack>
         <TextInput 
           label="Customer Name" 

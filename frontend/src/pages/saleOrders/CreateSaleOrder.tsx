@@ -17,7 +17,7 @@ const CreateSaleOrder = () => {
     <Container size="md">
       <Stack>
         <Title order={1}>Create Sale Order</Title>
-        <SaleOrderForm onSubmit={handleSubmit} isLoading={createSaleOrderMutation.isPending} />
+        <SaleOrderForm onSubmit={handleSubmit} />
       </Stack>
     </Container>
   );

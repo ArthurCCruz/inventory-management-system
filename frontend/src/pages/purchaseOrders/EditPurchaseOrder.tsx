@@ -30,7 +30,7 @@ const EditPurchaseOrder = () => {
     <Container size="md">
       <Stack>
         <Title order={1}>Edit Purchase Order</Title>
-        <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} isLoading={editPurchaseOrderMutation.isPending} />
+        <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
       </Stack>
     </Container>
   );

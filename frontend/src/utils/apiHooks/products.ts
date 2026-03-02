@@ -1,7 +1,7 @@
 import { Product, ProductFinancialData } from "@/types/models/product";
 import { StockMove } from "@/types/models/stock";
 import { apiFetch } from "@/utils/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery } from "@tanstack/react-query";
 
 const getProductRequest = async (id: string) => {
   const response = await apiFetch<Product>(`products/${id}/`, { method: "GET" });
@@ -44,9 +44,10 @@ const deleteProductRequest = async (id: string) => {
   return response;
 }
 
-export const useDeleteProduct = (id: string) => {
+export const useDeleteProduct = (id: string, options?: UseMutationOptions) => {
   return useMutation({
     mutationFn: () => deleteProductRequest(id),
+    ...options,
   });
 }
 
@@ -105,8 +106,9 @@ const updateQuantityRequest = async (productId: string, data: UpdateProductQuant
   return response;
 }
 
-export const useUpdateProductQuantity = (productId: string) => {
+export const useUpdateProductQuantity = (productId: string, options?: UseMutationOptions<void, Error, UpdateProductQuantityData[]>) => {
   return useMutation({
     mutationFn: (data: UpdateProductQuantityData[]) => updateQuantityRequest(productId, data),
+    ...options,
   });
 }

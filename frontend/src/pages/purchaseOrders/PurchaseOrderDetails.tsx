@@ -9,25 +9,34 @@ import { formatDate } from "@/utils/date";
 import DataTable, { DataColumn } from "@/components/DataTable";
 import { PurchaseOrderLine } from "@/types/models/purchaseOrder";
 import Loading from "@/components/Loading";
+import { useErrorHandler } from "@/utils/errorHandler";
 
 const PurchaseOrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useGetPurchaseOrder(id!);
+  const { handleError } = useErrorHandler();
 
-  const deletePurchaseOrderMutation = useDeletePurchaseOrder(id!);
-  const confirmPurchaseOrderMutation = useConfirmPurchaseOrder(id!);
-  const receivePurchaseOrderMutation = useReceivePurchaseOrder(id!);
+  const deletePurchaseOrderMutation = useDeletePurchaseOrder(id!, {
+    onSuccess: () => {
+      navigate("/purchase-orders");
+    },
+    onError: handleError,
+  });
 
-  const confirmPurchaseOrder = async () => {
-    await confirmPurchaseOrderMutation.mutateAsync();
-    refetch();
-  }
+  const confirmPurchaseOrderMutation = useConfirmPurchaseOrder(id!, {
+    onSuccess: () => {
+      refetch();
+    },
+    onError: handleError,
+  });
 
-  const receivePurchaseOrder = async () => {
-    await receivePurchaseOrderMutation.mutateAsync();
-    refetch();
-  }
+  const receivePurchaseOrderMutation = useReceivePurchaseOrder(id!, {
+    onSuccess: () => {
+      refetch();
+    },
+    onError: handleError,
+  });
 
   if (isLoading) {
     return <Loading />;
@@ -49,15 +58,12 @@ const PurchaseOrderDetails = () => {
       },
       {
         label: "Confirm",
-        onClick: confirmPurchaseOrder,
+        onClick: confirmPurchaseOrderMutation.mutateAsync,
         icon: <IconCheck size={16} />,
       },
       {
         label: "Delete",
-        onClick: async () => {
-          await deletePurchaseOrderMutation.mutateAsync();
-          navigate("/purchase-orders");
-        },
+        onClick: deletePurchaseOrderMutation.mutateAsync,
         icon: <IconTrash size={16} />,
         color: "red",
       },
@@ -68,7 +74,7 @@ const PurchaseOrderDetails = () => {
     actions.push(
       {
         label: "Receive",
-        onClick: receivePurchaseOrder,
+        onClick: receivePurchaseOrderMutation.mutateAsync,
         icon: <IconCheck size={16} />,
       },
     )

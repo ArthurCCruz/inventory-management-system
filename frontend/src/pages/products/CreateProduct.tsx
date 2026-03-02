@@ -21,7 +21,6 @@ const CreateProduct = () => {
         <Title order={1}>Create Product</Title>
         <ProductForm
           onSubmit={handleSubmit}
-          isLoading={createProductMutation.isPending}
         />
       </Stack>
     </Container>
