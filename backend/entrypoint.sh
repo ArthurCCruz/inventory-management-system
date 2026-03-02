@@ -13,6 +13,10 @@ echo "PostgreSQL is up - continuing..."
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
+# Create superuser if not exists
+echo "Creating superuser if not exists..."
+python manage.py create_superuser_if_not_exists
+
 # Collect static files in production
 if [ "$DEBUG" = "False" ]; then
   echo "Collecting static files..."
