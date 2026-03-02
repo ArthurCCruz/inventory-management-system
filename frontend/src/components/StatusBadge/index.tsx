@@ -2,7 +2,7 @@ import { Badge } from "@mantine/core";
 import { FC } from "react";
 import { colors } from "@/styles/theme";
 
-export type StatusVariant = 'draft' | 'confirmed' | 'done' | 'completed' | 'reserved';
+export type StatusVariant = 'draft' | 'confirmed' | 'reserved' | 'delivered' | 'received';
 
 interface StatusBadgeProps {
   status: string;
@@ -39,7 +39,8 @@ function detectVariant(status: string): StatusVariant {
   
   if (lowercaseStatus === 'draft') return 'draft';
   if (lowercaseStatus === 'confirmed') return 'confirmed';
-  if (lowercaseStatus === 'done' || lowercaseStatus === 'completed') return 'done';
+  if (lowercaseStatus === 'delivered') return 'delivered';
+  if (lowercaseStatus === 'received') return 'received';
   if (lowercaseStatus === 'reserved') return 'reserved';
   
   return 'draft'; // default
@@ -47,16 +48,17 @@ function detectVariant(status: string): StatusVariant {
 
 // Helper function to get colors based on variant
 function getStatusColors(variant: StatusVariant) {
+  console.log(variant);
   switch (variant) {
     case 'draft':
       return colors.status.draft;
     case 'confirmed':
       return colors.status.confirmed;
-    case 'done':
-    case 'completed':
-      return colors.status.done;
     case 'reserved':
       return colors.status.reserved;
+    case 'delivered':
+    case 'received':
+      return colors.status.done;
     default:
       return colors.status.draft;
   }
