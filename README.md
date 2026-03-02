@@ -2,6 +2,17 @@
 
 A full-stack inventory management system built with Django REST Framework (backend) and React (frontend), fully containerized with Docker for both development and production environments.
 
+A demo application running this project was deployed on render.com and can be accessed at https://inventory-management-system-xmrs.onrender.com/
+
+Keep in mind that due to Render's free tier nature, servers sleep after not being used, so it might take a few seconds for the page to load the first time you visit it.
+
+You can login using the following credentials:
+username: `demouser`
+passoword: `demopassword`
+
+Or, fell free to signup and start from scratch!
+
+
 ## 🏗️ Architecture
 
 This project consists of two independent applications:
