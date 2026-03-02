@@ -66,7 +66,7 @@ const PurchaseOrderDetails = () => {
         label: "Delete",
         onClick: deletePurchaseOrderMutation.mutateAsync,
         icon: <IconTrash size={16} />,
-        color: "red",
+        variant: "danger" as const,
       },
     )
   }
