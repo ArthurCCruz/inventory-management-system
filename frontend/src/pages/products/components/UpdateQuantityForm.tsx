@@ -1,5 +1,5 @@
 import { StockLot, StockQuantity } from "@/types/models/stock";
-import { Button, NumberInput, Stack, Select, Box, Text, Paper, Group, ActionIcon, Checkbox } from "@mantine/core";
+import { Button, NumberInput, Stack, Select, Box, Paper, Group, ActionIcon, Checkbox } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -87,10 +87,6 @@ const UpdateQuantityForm: FC<UpdateQuantityFormProps> = ({ quantityList, lotList
     <form onSubmit={handleSubmit}>
       <Stack>
         <Box>
-          <Text size="sm" fw={500} mb="xs">
-            Stock Quantities
-          </Text>
-          
           <Stack gap="md">
             {form.values.lines.map((line, index) => (
               <Paper key={index} p="md" withBorder>

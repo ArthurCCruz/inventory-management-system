@@ -1,9 +1,13 @@
-import { Container, Title, Stack, Card, TextInput, Button } from "@mantine/core"
+import { Container, Stack, TextInput } from "@mantine/core"
 import { useForm } from "@mantine/form";
 import { SignupData, useSignup } from "@/utils/apiHooks/auth";
 import { useState } from "react";
 import { FormValidationError } from "@/utils/api";
 import { useAuth } from "@/contexts/AuthContext";
+import Card from "@/components/Card";
+import Button from "@/components/Button";
+import FormSection from "@/components/FormSection";
+import Title from "@/components/Title";
 
 const Signup = () => {
 
@@ -65,43 +69,47 @@ const Signup = () => {
   };
 
   return (
-    <Container size="md" className="py-8">
-      <Stack gap="lg">
-        <div className="text-center">
-          <Title order={1} className="mb-4">
+    <Container size="md" pt="xl" pb="xl">
+      <Stack gap="xl">
+        <div style={{ textAlign: 'center' }}>
+          <Title order={1} mb="sm" fontSize="3xl">
             Signup
           </Title>
         </div>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card padding="lg">
           <form onSubmit={form.onSubmit(handleSubmit)}>
-            <Stack gap="md">
-              <TextInput
-                label="First Name"
-                placeholder="First Name"
-                required
-                {...form.getInputProps("firstName")}
-              />
-              <TextInput
-                label="Last Name"
-                placeholder="Last Name"
-                required
-                {...form.getInputProps("lastName")}
-              />
-              <TextInput
-                label="Username"
-                placeholder="Username"
-                required
-                {...form.getInputProps("username")}
-              />
-              <TextInput
-                label="Password"
-                placeholder="Password"
-                required
-                type="password"
-                {...form.getInputProps("password")}
-              />
-              <Button type="submit" loading={isLoading}>Send</Button>
+            <Stack gap="lg">
+              <FormSection columns={2}>
+                <TextInput
+                  label="First Name"
+                  placeholder="First Name"
+                  required
+                  {...form.getInputProps("firstName")}
+                />
+                <TextInput
+                  label="Last Name"
+                  placeholder="Last Name"
+                  required
+                  {...form.getInputProps("lastName")}
+                />
+              </FormSection>
+              <FormSection>
+                <TextInput
+                  label="Username"
+                  placeholder="Username"
+                  required
+                  {...form.getInputProps("username")}
+                />
+                <TextInput
+                  label="Password"
+                  placeholder="Password"
+                  required
+                  type="password"
+                  {...form.getInputProps("password")}
+                />
+              </FormSection>
+              <Button type="submit" loading={isLoading} variant="primary">Send</Button>
             </Stack>
           </form>
         </Card>

@@ -10,6 +10,7 @@ import { useConfirmSaleOrder, useDeleteSaleOrder, useDeliverSaleOrder, useGetSal
 import { SaleOrderLine } from "@/types/models/saleOrder";
 import Loading from "@/components/Loading";
 import { useErrorHandler } from "@/utils/errorHandler";
+import StatusBadge from "@/components/StatusBadge";
 
 
 const SaleOrderDetails = () => {
@@ -107,7 +108,10 @@ const SaleOrderDetails = () => {
         <Stack gap="lg">
           <DetailsField label="SO Number" value={data.name} />
           <DetailsField label="Customer Name" value={data.customer_name} />
-          <DetailsField label="Status" value={data.status} />
+          <Group gap="md">
+            <DetailsField label="Status" value="" />
+            <StatusBadge status={data.status} />
+          </Group>
         </Stack>
         <Stack gap="lg">
           <DetailsField label="Created At" value={formatDate(data.created_at)} />
@@ -115,7 +119,7 @@ const SaleOrderDetails = () => {
           <DetailsField label="Created By" value={data.created_by.name} />
         </Stack>
       </SimpleGrid>
-      <Stack gap="lg" mt="lg" justify="flex-end">
+      <Stack gap="lg" mt="lg">
         <DataTable data={data.lines} columns={lineColumns} emptyText="This sale order has no lines." />
       </Stack>
       <Group gap="lg" mt="lg" justify="flex-end">

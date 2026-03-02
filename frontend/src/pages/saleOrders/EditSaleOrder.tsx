@@ -1,8 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEditSaleOrder, useGetSaleOrder } from "../../utils/apiHooks/saleOrder";
-import { Container, Stack, Title } from "@mantine/core";
+import { Container, Stack } from "@mantine/core";
 import SaleOrderForm from "./components/SaleOrderForm";
 import { UpsertSaleOrderData } from "@/utils/apiHooks/saleOrder";
+import Card from "@/components/Card";
+import Title from "@/components/Title";
 
 
 const EditSaleOrder = () => {
@@ -29,9 +31,13 @@ const EditSaleOrder = () => {
 
   return (
     <Container size="md">
-      <Stack>
-        <Title order={1}>Edit Sale Order</Title>
-        <SaleOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
+      <Stack gap="lg">
+        <Title order={1}>
+          Edit Sale Order
+        </Title>
+        <Card>
+          <SaleOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
+        </Card>
       </Stack>
     </Container>
   );

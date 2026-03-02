@@ -1,8 +1,9 @@
-import { Container, Stack, Title } from "@mantine/core";
+import { Container, Stack } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import ProductForm, { ProductFormValues } from "./components/ProductForm";
 import { useCreateProduct } from "@/utils/apiHooks/products";
-
+import Card from "@/components/Card";
+import Title from "@/components/Title";
 
 
 const CreateProduct = () => {
@@ -17,11 +18,15 @@ const CreateProduct = () => {
 
   return (
     <Container size="md">
-      <Stack>
-        <Title order={1}>Create Product</Title>
-        <ProductForm
-          onSubmit={handleSubmit}
-        />
+      <Stack gap="lg">
+        <Title order={1}>
+          Create Product
+        </Title>
+        <Card>
+          <ProductForm
+            onSubmit={handleSubmit}
+          />
+        </Card>
       </Stack>
     </Container>
   );

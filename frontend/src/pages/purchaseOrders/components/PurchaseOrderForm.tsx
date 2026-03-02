@@ -1,10 +1,14 @@
-import { Stack, TextInput, Button, Group, NumberInput, Select, Box, Text, ActionIcon, Paper } from "@mantine/core";
+import { Stack, TextInput, Group, NumberInput, Select, Box, Text, ActionIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useListProducts } from "@/utils/apiHooks/products";
 import { UpsertPurchaseOrderData } from "@/utils/apiHooks/purchaseOrders";
 import useFormSubmitHandler from "@/utils/formSubmitHandler";
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import FormSection from "@/components/FormSection";
+import { colors, typography } from "@/styles/theme";
 
 interface PurchaseOrderFormProps {
   onSubmit: (values: UpsertPurchaseOrderData) => Promise<void>;
@@ -51,22 +55,34 @@ const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack>
-        <TextInput 
-          label="Supplier Name" 
-          placeholder="Enter supplier name" 
-          required 
-          {...form.getInputProps("supplier_name")} 
-        />
+      <Stack gap="lg">
+        <FormSection title="Supplier Information">
+          <TextInput 
+            label="Supplier Name" 
+            placeholder="Enter supplier name" 
+            required 
+            {...form.getInputProps("supplier_name")} 
+          />
+        </FormSection>
 
         <Box>
-          <Text size="sm" fw={500} mb="xs">
+          <Text 
+            size="sm" 
+            fw={600} 
+            mb="md"
+            style={{
+              color: colors.primary.main,
+              textTransform: 'uppercase',
+              letterSpacing: typography.letterSpacing.wide,
+              fontSize: typography.fontSize.sm,
+            }}
+          >
             Order Lines *
           </Text>
           
           <Stack gap="md">
             {form.values.lines.map((_, index) => (
-              <Paper key={index} p="md" withBorder>
+              <Card key={index} padding="md" hover>
                 <Stack gap="sm">
                   <Group align="start" wrap="nowrap">
                     <Select
@@ -112,13 +128,13 @@ const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({
                     </ActionIcon>
                   </Group>
                 </Stack>
-              </Paper>
+              </Card>
             ))}
           </Stack>
 
           <Button
             leftSection={<IconPlus size={16} />}
-            variant="light"
+            variant="secondary"
             onClick={addLine}
             mt="md"
             style={{ float: "right" }}
@@ -127,7 +143,7 @@ const PurchaseOrderForm: FC<PurchaseOrderFormProps> = ({
           </Button>
         </Box>
 
-        <Button type="submit" loading={isLoading} mt="md">
+        <Button type="submit" loading={isLoading} variant="primary" mt="md">
           Submit
         </Button>
       </Stack>

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useConfirmPurchaseOrder, useReceivePurchaseOrder, useDeletePurchaseOrder, useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
 import DetailsView from "@/components/DetailsView";
 import { IconCheck, IconPencil, IconTrash } from "@tabler/icons-react";
-import { SimpleGrid, Stack } from "@mantine/core";
+import { SimpleGrid, Stack, Group } from "@mantine/core";
 import DetailsField from "@/components/DetailsField";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
@@ -10,6 +10,7 @@ import DataTable, { DataColumn } from "@/components/DataTable";
 import { PurchaseOrderLine } from "@/types/models/purchaseOrder";
 import Loading from "@/components/Loading";
 import { useErrorHandler } from "@/utils/errorHandler";
+import StatusBadge from "@/components/StatusBadge";
 
 const PurchaseOrderDetails = () => {
   const { id } = useParams();
@@ -93,7 +94,13 @@ const PurchaseOrderDetails = () => {
         <Stack gap="lg">
           <DetailsField label="PO Number" value={data.name} />
           <DetailsField label="Supplier Name" value={data.supplier_name} />
-          <DetailsField label="Status" value={data.status} />
+          <Group gap="md">
+            <DetailsField 
+              label="Status" 
+              value="" 
+            />
+            <StatusBadge status={data.status} />
+          </Group>
         </Stack>
         <Stack gap="lg">
           <DetailsField label="Created At" value={formatDate(data.created_at)} />
@@ -101,9 +108,13 @@ const PurchaseOrderDetails = () => {
           <DetailsField label="Created By" value={data.created_by.name} />
         </Stack>
       </SimpleGrid>
-      <DataTable data={data.lines} columns={lineColumns} />
-          <DetailsField label="Total Price" value={formatCurrency(data.total_price)} />
-          </DetailsView>
+      <Stack gap="lg" mt="lg">
+        <DataTable data={data.lines} columns={lineColumns} emptyText="This purchase order has no lines." />
+      </Stack>
+      <Group gap="lg" mt="lg" justify="flex-end">
+        <DetailsField label="Total Price" value={formatCurrency(data.total_price)} />
+      </Group>
+    </DetailsView>
   );
 };
 

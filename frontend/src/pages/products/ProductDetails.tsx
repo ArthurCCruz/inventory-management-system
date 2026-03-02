@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "@/utils/date";
 import DetailsView from "@/components/DetailsView";
 import DetailsField from "@/components/DetailsField";
-import { Divider, SimpleGrid, Stack, Title } from "@mantine/core";
+import { Divider, SimpleGrid, Stack } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useDeleteProduct, useGetProduct, useGetProductFinancialData, useGetProductStockMoves } from "../../utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
@@ -13,6 +13,7 @@ import { useGetProductQuantity } from "@/utils/apiHooks/stock";
 import { formatCurrency } from "@/utils/currency";
 import Loading from "@/components/Loading";
 import { useErrorHandler } from "@/utils/errorHandler";
+import Title from "@/components/Title";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -103,7 +104,9 @@ const ProductDetails = () => {
         </Stack>
       </SimpleGrid>
       <Divider my="lg" />
-      <Title order={3}>Stock</Title>
+      <Title order={3}>
+        Stock
+      </Title>
       <SimpleGrid cols={2} spacing="lg">
         <Stack gap="lg">
           <DetailsField label="Stock Quantity" value={formatNumber(data.stock_quantity_totals.quantity)} action={updateQuantityAction} />
@@ -116,7 +119,9 @@ const ProductDetails = () => {
       </SimpleGrid>
       <DataTable data={stockQuantity || []} columns={stockQuantityColumns} emptyText="No stock quantity found." />
       <Divider my="lg" />
-      <Title order={3}>Financial Data</Title>
+      <Title order={3}>
+        Financial Data
+      </Title>
       <SimpleGrid cols={2} spacing="lg">
         <Stack gap="lg">
           <DetailsField label="Stock Unit Price" value={formatCurrency(financialData?.stock_unit_price || 0)} />
@@ -136,7 +141,9 @@ const ProductDetails = () => {
         </Stack>
       </SimpleGrid>
       <Divider my="lg" />
-      <Title order={3}>Stock Moves</Title>
+      <Title order={3}>
+        Stock Moves
+      </Title>
       <ExpandableTable 
         data={stockMoves || []} 
         columns={stockMoveColumns} 

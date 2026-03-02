@@ -1,5 +1,5 @@
 import { Product } from "@/types/models/product";
-import { Button, Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "@/utils/date";
@@ -7,6 +7,8 @@ import DataTable, { DataColumn } from "@/components/DataTable";
 import { useListProducts } from "@/utils/apiHooks/products";
 import { formatNumber } from "@/utils/number";
 import Loading from "@/components/Loading";
+import PageHeader from "@/components/PageHeader";
+import Button from "@/components/Button";
 
 const ProductList = () => {
   const navigate = useNavigate();
@@ -30,10 +32,21 @@ const ProductList = () => {
   ];
 
   return (
-    <Stack>
-      <Group p="md">
-        <Button leftSection={<IconPlus size={16} />} component={Link} to="/products/new">Create Product</Button>
-      </Group>
+    <Stack gap="lg">
+      <PageHeader
+        title="Products"
+        subtitle="Manage your product inventory"
+        actions={
+          <Button 
+            leftSection={<IconPlus size={18} />} 
+            component={Link} 
+            to="/products/new"
+            variant="primary"
+          >
+            Create Product
+          </Button>
+        }
+      />
       <DataTable
         data={data || []}
         columns={columns}

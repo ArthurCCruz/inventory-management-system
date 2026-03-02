@@ -1,8 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEditPurchaseOrder, useGetPurchaseOrder } from "../../utils/apiHooks/purchaseOrders";
-import { Container, Stack, Title } from "@mantine/core";
+import { Container, Stack } from "@mantine/core";
 import PurchaseOrderForm from "./components/PurchaseOrderForm";
 import { UpsertPurchaseOrderData } from "@/utils/apiHooks/purchaseOrders";
+import Card from "@/components/Card";
+import Title from "@/components/Title";
 
 const EditPurchaseOrder = () => {
   const { id } = useParams();
@@ -28,9 +30,13 @@ const EditPurchaseOrder = () => {
 
   return (
     <Container size="md">
-      <Stack>
-        <Title order={1}>Edit Purchase Order</Title>
-        <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
+      <Stack gap="lg">
+        <Title order={1}>
+          Edit Purchase Order
+        </Title>
+        <Card>
+          <PurchaseOrderForm onSubmit={handleSubmit} initialValues={{...data, lines: formLines}} />
+        </Card>
       </Stack>
     </Container>
   );

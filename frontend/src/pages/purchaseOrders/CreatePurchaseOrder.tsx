@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { Container, Stack, Title } from "@mantine/core";
+import { Container, Stack } from "@mantine/core";
 import PurchaseOrderForm from "./components/PurchaseOrderForm";
 import { UpsertPurchaseOrderData, useCreatePurchaseOrder } from "@/utils/apiHooks/purchaseOrders";
+import Card from "@/components/Card";
+import Title from "@/components/Title";
 
 const CreatePurchaseOrder = () => {
   const navigate = useNavigate();
@@ -15,9 +17,13 @@ const CreatePurchaseOrder = () => {
 
   return (
     <Container size="md">
-      <Stack>
-        <Title order={1}>Create Purchase Order</Title>
-        <PurchaseOrderForm onSubmit={handleSubmit} />
+      <Stack gap="lg">
+        <Title order={1}>
+          Create Purchase Order
+        </Title>
+        <Card>
+          <PurchaseOrderForm onSubmit={handleSubmit} />
+        </Card>
       </Stack>
     </Container>
   );

@@ -1,12 +1,14 @@
-import { Card, Stack, Container, Group, Button, MantineColor } from "@mantine/core";
+import { Stack, Container, Group } from "@mantine/core";
 import { FC, PropsWithChildren } from "react";
+import Card from "@/components/Card";
+import Button, { ButtonVariant } from "@/components/Button";
 
 interface DetailsViewProps extends PropsWithChildren {
   actions?: {
     label: string;
     onClick: () => void;
     icon: React.ReactNode;
-    color?: MantineColor;
+    variant?: ButtonVariant;
   }[];
 }
 
@@ -14,15 +16,21 @@ const DetailsView: FC<DetailsViewProps> = ({ children, actions }) => {
   return (
     <Container size="lg">
     <Stack gap="md" p="md">
-      <Group>
-        {actions?.map((action) => (
-          <Button key={action.label} onClick={action.onClick} color={action.color}>
-            {action.icon}
-            {action.label}
-          </Button>
-        ))}
-      </Group>
-      <Card withBorder shadow="sm" radius="md" padding="lg">
+      {actions && actions.length > 0 && (
+        <Group>
+          {actions.map((action) => (
+            <Button 
+              key={action.label} 
+              onClick={action.onClick}
+              variant={action.variant}
+              leftSection={action.icon}
+            >
+              {action.label}
+            </Button>
+          ))}
+        </Group>
+      )}
+      <Card padding="lg">
         <Stack gap="lg">
           {children}
         </Stack>

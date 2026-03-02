@@ -1,7 +1,9 @@
 import useFormSubmitHandler from "@/utils/formSubmitHandler";
-import { Stack, TextInput, Select, Button } from "@mantine/core";
+import { Stack, TextInput, Select } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
+import Button from "@/components/Button";
+import FormSection from "@/components/FormSection";
 
 export interface ProductFormValues {
   name: string;
@@ -32,24 +34,30 @@ const ProductForm: FC<ProductFormProps> = ({ onSubmit, initialValues = { name: "
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack>
-        <TextInput label="Name" placeholder="Name" required {...form.getInputProps("name")} />
-        <TextInput label="SKU" placeholder="SKU" required {...form.getInputProps("sku")} />
-        <TextInput label="Description" placeholder="Description" required {...form.getInputProps("description")} />
-        <Select 
-          label="Unit" 
-          placeholder="Select unit" 
-          required 
-          data={[
-            { value: "kg", label: "kg" },
-            { value: "g", label: "g" },
-            { value: "unit", label: "unit" },
-            { value: "l", label: "l" },
-            { value: "ml", label: "ml" },
-          ]}
-          {...form.getInputProps("unit")}
-        />
-        <Button type="submit" loading={isLoading}>Submit</Button>
+      <Stack gap="lg">
+        <FormSection title="Basic Information" columns={2}>
+          <TextInput label="Name" placeholder="Product name" required {...form.getInputProps("name")} />
+          <TextInput label="SKU" placeholder="Product SKU" required {...form.getInputProps("sku")} />
+        </FormSection>
+        
+        <FormSection title="Details" columns={2}>
+          <TextInput label="Description" placeholder="Product description" required {...form.getInputProps("description")} />
+          <Select 
+            label="Unit" 
+            placeholder="Select unit" 
+            required 
+            data={[
+              { value: "kg", label: "kg" },
+              { value: "g", label: "g" },
+              { value: "unit", label: "unit" },
+              { value: "l", label: "l" },
+              { value: "ml", label: "ml" },
+            ]}
+            {...form.getInputProps("unit")}
+          />
+        </FormSection>
+        
+        <Button type="submit" loading={isLoading} variant="primary">Submit</Button>
       </Stack>
     </form>
   );
