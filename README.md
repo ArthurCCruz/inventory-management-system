@@ -59,37 +59,6 @@ The backend API will be available at:
 
 **Hot Reload**: The Django development server will automatically reload when you edit Python files in the `backend/` directory.
 
-##### Running Tests
-
-To run tests for the backend:
-
-```bash
-# Run all tests
-docker compose exec web python manage.py test
-
-# Run specific app tests
-docker compose exec web python manage.py test apps.products
-docker compose exec web python manage.py test apps.auth
-
-# Run specific test file
-docker compose exec web python manage.py test apps.products.tests.test_models
-
-# Run specific test class
-docker compose exec web python manage.py test apps.products.tests.test_models.ProductModelTestCase
-
-# Run specific test method
-docker compose exec web python manage.py test apps.products.tests.test_models.ProductModelTestCase.test_valid_product_creation
-
-# Run in parallel (faster)
-docker compose exec web python manage.py test --parallel
-
-# Keep database between runs (faster for iterative testing)
-docker compose exec web python manage.py test --keepdb
-
-# Run with verbose output
-docker compose exec web python manage.py test --verbosity=2
-```
-
 #### Frontend Development
 
 1. Navigate to the frontend directory:
@@ -175,4 +144,35 @@ python manage.py shell
 **Database access:**
 ```bash
 docker compose exec db psql -U inventory_user -d inventory_db
+```
+
+##### Running Tests
+
+**Running Tests**
+
+```bash
+# Run all tests
+docker compose exec web python manage.py test
+
+# Run specific app tests
+docker compose exec web python manage.py test apps.products
+docker compose exec web python manage.py test apps.auth
+
+# Run specific test file
+docker compose exec web python manage.py test apps.products.tests.test_models
+
+# Run specific test class
+docker compose exec web python manage.py test apps.products.tests.test_models.ProductModelTestCase
+
+# Run specific test method
+docker compose exec web python manage.py test apps.products.tests.test_models.ProductModelTestCase.test_valid_product_creation
+
+# Run in parallel (faster)
+docker compose exec web python manage.py test --parallel
+
+# Keep database between runs (faster for iterative testing)
+docker compose exec web python manage.py test --keepdb
+
+# Run with verbose output
+docker compose exec web python manage.py test --verbosity=2
 ```
