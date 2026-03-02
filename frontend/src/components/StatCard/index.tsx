@@ -4,6 +4,7 @@ import Card from "../Card";
 import { colors, typography } from "@/styles/theme";
 
 interface StatCardProps {
+  onClick?: () => void;
   title: string;
   value: string | number;
   icon: ReactNode;
@@ -16,6 +17,7 @@ interface StatCardProps {
 }
 
 const StatCard: FC<StatCardProps> = ({ 
+  onClick,
   title, 
   value, 
   icon, 
@@ -24,7 +26,7 @@ const StatCard: FC<StatCardProps> = ({
   trend
 }) => {
   return (
-    <Card padding="lg" hover>
+    <Card padding="lg" hover onClick={onClick}>
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Stack gap="xs" style={{ flex: 1 }}>
           <Text

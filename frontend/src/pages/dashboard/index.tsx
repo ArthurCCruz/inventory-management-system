@@ -19,9 +19,18 @@ import {
 } from "@tabler/icons-react";
 import { useDashboard } from "@/utils/apiHooks/dashboard";
 import Loading from "@/components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { data: dashboardData, isLoading } = useDashboard();
+  const navigate = useNavigate();
+
+  const handlePurchaseOrderClick = (status: string) => {
+    navigate(`/purchase-orders?status=${status}`);
+  };
+  const handleSaleOrderClick = (status: string) => {
+    navigate(`/sale-orders?status=${status}`);
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -113,6 +122,7 @@ const Dashboard = () => {
             icon={<IconClock size={28} />}
             color="#f59e0b"
             subtitle="Pending approval"
+            onClick={() => handleSaleOrderClick('draft')}
           />
           <StatCard
             title="Waiting Reservation"
@@ -120,6 +130,7 @@ const Dashboard = () => {
             icon={<IconClipboardCheck size={28} />}
             color="#8b5cf6"
             subtitle="Awaiting stock allocation"
+            onClick={() => handleSaleOrderClick('confirmed')}
           />
           <StatCard
             title="Waiting Delivery"
@@ -127,6 +138,7 @@ const Dashboard = () => {
             icon={<IconTruck size={28} />}
             color="#06b6d4"
             subtitle="Ready to ship"
+            onClick={() => handleSaleOrderClick('reserved')}
           />
           <StatCard
             title="Complete"
@@ -134,6 +146,7 @@ const Dashboard = () => {
             icon={<IconCheck size={28} />}
             color={colors.primary.main}
             subtitle="Successfully delivered"
+            onClick={() => handleSaleOrderClick('delivered')}
           />
         </SimpleGrid>
 
@@ -149,6 +162,7 @@ const Dashboard = () => {
             icon={<IconClock size={28} />}
             color="#f59e0b"
             subtitle="Pending approval"
+            onClick={() => handlePurchaseOrderClick('draft')}
           />
           <StatCard
             title="Waiting Receipt"
@@ -156,6 +170,7 @@ const Dashboard = () => {
             icon={<IconBoxSeam size={28} />}
             color="#6366f1"
             subtitle="Awaiting delivery"
+            onClick={() => handlePurchaseOrderClick('confirmed')}
           />
           <StatCard
             title="Complete"
@@ -163,6 +178,7 @@ const Dashboard = () => {
             icon={<IconCheck size={28} />}
             color={colors.primary.main}
             subtitle="Successfully received"
+            onClick={() => handlePurchaseOrderClick('received')}
           />
         </SimpleGrid>
         <Divider />

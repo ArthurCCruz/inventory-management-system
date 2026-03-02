@@ -6,14 +6,16 @@ import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
 import StatusBadge from "@/components/StatusBadge";
 
 const SaleOrderList = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useListSaleOrders();
+  const [searchParams] = useSearchParams();
+  const status = searchParams.get("status");
+  const { data, isLoading } = useListSaleOrders({ status });
 
   if (isLoading) {
     return <Loading />;

@@ -4,7 +4,7 @@ import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Loading from "@/components/Loading";
 import { useListPurchaseOrders } from "@/utils/apiHooks/purchaseOrders";
 import PageHeader from "@/components/PageHeader";
@@ -15,8 +15,10 @@ import StatusBadge from "@/components/StatusBadge";
 
 const PurchaseOrderList = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const status = searchParams.get("status");
 
-  const { data, isLoading } = useListPurchaseOrders();
+  const { data, isLoading } = useListPurchaseOrders({ status });
 
   if (isLoading) {
     return <Loading />;

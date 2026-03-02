@@ -1,12 +1,12 @@
 from django.db import transaction
-from rest_framework import status
+from rest_framework import filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.common.views import OwnedModelViewSet
 from apps.products.services import update_product_quantity
-from apps.stock.serializers import StockQuantitySerializer, UpdateStockQuantitySerializer
+from apps.stock.serializers import StockMoveSerializer, StockQuantitySerializer, UpdateStockQuantitySerializer
 from .models import Product
-from .serializers import ProductFinancialDataSerializer, ProductLotSerializer, ProductSerializer, ProductMovesSerializer, ProductStockQuantitySerializer, ProductUpsertSerializer
+from .serializers import ProductFinancialDataSerializer, ProductLotSerializer, ProductSerializer, ProductStockQuantitySerializer, ProductUpsertSerializer
 from typing import cast
 
 class ProductViewSet(OwnedModelViewSet):
@@ -26,8 +26,12 @@ class ProductViewSet(OwnedModelViewSet):
     @action(detail=True, methods=["get"])
     def moves(self, request, pk=None):
         product = self.get_object()
-        serializer = ProductMovesSerializer(product)
-        return Response(serializer.data["stock_moves"], status=status.HTTP_200_OK)
+        moves_queryset = product.stock_moves.all()
+        ordering_filter = filters.OrderingFilter()
+        ordering_filter.ordering_fields = ["updated_at"]
+        moves_queryset = ordering_filter.filter_queryset(request, moves_queryset, self)
+        serializer = StockMoveSerializer(moves_queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=["get"], url_path="lots")
     def lots(self, request, pk=None):

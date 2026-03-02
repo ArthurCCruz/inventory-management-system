@@ -1,14 +1,18 @@
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import filters, status
 from django.db import transaction
 from apps.common.views import OwnedModelViewSet
 from apps.purchase_orders.serializers import PurchaseOrderDetailSerializer, PurchaseOrderListSerializer, UpsertPurchaseOrderSerializer
 from .models import PurchaseOrder
+from django_filters.rest_framework import DjangoFilterBackend
 
 class PurchaseOrderViewSet(OwnedModelViewSet):
     queryset = PurchaseOrder.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["status"]
+    ordering_fields = ["created_at"]
 
     def get_serializer_class(self):
         if self.action in ("create", "partial_update"):

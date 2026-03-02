@@ -14,15 +14,19 @@ export const useGetSaleOrder = (id: string) => {
   });
 }
 
-const saleOrdersRequest = async () => {
-  const res = await apiFetch<SaleOrder[]>("sale-orders/", { method: "GET" });
+type SaleOrderFilter = {
+  status?: string | null;
+}
+
+const saleOrdersRequest = async (filter: SaleOrderFilter = {}) => {
+  const res = await apiFetch<SaleOrder[]>("sale-orders/", { method: "GET" }, {...filter, ordering: "-created_at"});
   return res;
 }
 
-export const useListSaleOrders = () => {
+export const useListSaleOrders = (filter?: SaleOrderFilter) => {
   return useQuery({
     queryKey: ["sale-orders"],
-    queryFn: saleOrdersRequest,
+    queryFn: () => saleOrdersRequest(filter),
   });
 }
 

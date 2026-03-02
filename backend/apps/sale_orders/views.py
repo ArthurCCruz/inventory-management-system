@@ -1,14 +1,19 @@
 from django.db import transaction
-from rest_framework import status
+from rest_framework import filters, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from apps.common.views import OwnedModelViewSet
 from apps.sale_orders.models import SaleOrder
 from apps.sale_orders.serializers import SaleOrderDetailSerializer, SaleOrderListSerializer, UpsertSaleOrderSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 class SaleOrderViewSet(OwnedModelViewSet):
     queryset = SaleOrder.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["status"]
+
+    ordering_fields = ["created_at"]
 
     def get_serializer_class(self):
         if self.action in ("create", "partial_update"):

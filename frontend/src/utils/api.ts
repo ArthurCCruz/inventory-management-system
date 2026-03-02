@@ -49,8 +49,14 @@ const shouldRefreshToken = (response: { messages?: { message: string }[] }) => {
   return response.messages && response.messages.find(({message}: {message: string}) => message.includes("Token is expired"));
 };
 
-export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}): Promise<T> => {
-  const url = `${BASE_URL}/${endpoint}`;
+export const apiFetch = async <T>(endpoint: string, init: RequestInit = {}, queryParams: Record<string, string | null> = {}): Promise<T> => {
+  const params = new URLSearchParams();
+  Object.entries(queryParams).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    }
+  });
+  const url = `${BASE_URL}/${endpoint}${params.toString() ? `?${params.toString()}` : ""}`;
 
   const headers = new Headers(init.headers);
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);

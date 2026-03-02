@@ -14,15 +14,19 @@ export const useGetPurchaseOrder = (id: string) => {
   });
 }
 
-const purchaseOrdersRequest = async () => {
-  const res = await apiFetch<PurchaseOrder[]>("purchase-orders/", { method: "GET" });
+type PurchaseOrderFilter = {
+  status?: string | null;
+}
+
+const purchaseOrdersRequest = async (filter: PurchaseOrderFilter = {}) => {
+  const res = await apiFetch<PurchaseOrder[]>("purchase-orders/", { method: "GET" }, {...filter, ordering: "-created_at"});
   return res;
 }
 
-export const useListPurchaseOrders = () => {
+export const useListPurchaseOrders = (filter?: PurchaseOrderFilter) => {
   return useQuery({
     queryKey: ["purchase-orders"],
-    queryFn: purchaseOrdersRequest,
+    queryFn: () => purchaseOrdersRequest(filter),
   });
 }
 

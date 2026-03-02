@@ -47,14 +47,6 @@ class ProductStockQuantitySerializer(serializers.Serializer):
         fields = ["stock_quantity"]
         read_only_fields = fields
 
-class ProductMovesSerializer(serializers.ModelSerializer):
-    stock_moves = StockMoveSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = ["stock_moves"]
-        read_only_fields = fields
-
 class ProductFinancialDataSerializer(serializers.ModelSerializer):
     financial_data = serializers.SerializerMethodField()
 

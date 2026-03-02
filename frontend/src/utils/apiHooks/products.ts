@@ -52,7 +52,7 @@ export const useDeleteProduct = (id: string, options?: UseMutationOptions) => {
 }
 
 const getProductStockMovesRequest = async (id: string) => {
-  const response = await apiFetch<StockMove[]>(`products/${id}/moves/`, { method: "GET" });
+  const response = await apiFetch<StockMove[]>(`products/${id}/moves/`, { method: "GET" }, { ordering: "-updated_at" });
   return response;
 }
 
