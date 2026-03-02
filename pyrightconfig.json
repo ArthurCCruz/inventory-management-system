@@ -1,0 +1,20 @@
+{
+  "venvPath": ".",
+  "venv": "backend/.venv",
+  "extraPaths": [
+    "backend"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "pythonVersion": "3.11",
+      "pythonPlatform": "Linux",
+      "extraPaths": [
+        "backend"
+      ]
+    }
+  ],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "typeCheckingMode": "basic"
+}
