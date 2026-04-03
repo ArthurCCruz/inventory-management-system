@@ -1,4 +1,5 @@
 import { Center, Loader, Stack, Text } from '@mantine/core';
+import { useEffect, useState } from 'react';
 
 interface LoadingProps {
   message?: string;
@@ -11,6 +12,15 @@ export const Loading = ({
   size = 'lg',
   fullScreen = false 
 }: LoadingProps) => {
+  const [loadingMessage, setLoadingMessage] = useState(message);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingMessage("Servers are waking up at Render.com...");
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+  
   return (
     <Center 
       style={{ 
@@ -20,9 +30,9 @@ export const Loading = ({
     >
       <Stack align="center" gap="md">
         <Loader size={size} type="dots" />
-        {message && (
+        {loadingMessage && (
           <Text size="sm" c="dimmed">
-            {message}
+            {loadingMessage}
           </Text>
         )}
       </Stack>
